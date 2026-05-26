@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title id="page-title">عرض سعر - مجموعة طيبة للعطور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0a1628;--blue:#1a3a6e;--accent:#c8a95b;
+  --bg:#f0f4f8;--card:#fff;--border:#dde3ef;
+  --text:#1e293b;--muted:#64748b;--red:#dc2626;--green:#059669;
+  --shadow:0 2px 12px rgba(10,22,40,.10);--radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-text-size-adjust:100%;min-height:100vh;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 16px rgba(10,22,40,.3);position:sticky;top:0;z-index:40;}
+.header-logo{width:52px;height:52px;object-fit:contain;border-radius:8px;background:white;padding:3px;flex-shrink:0;}
+.header-brand{flex:1;min-width:0;}
+.header-title{color:var(--accent);font-size:16px;font-weight:900;line-height:1.2;}
+.header-sub{color:rgba(255,255,255,.55);font-size:11px;margin-top:1px;}
+.header-stats{display:flex;gap:8px;flex-shrink:0;}
+.stat-chip{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;text-align:center;color:white;min-width:54px;}
+.stat-chip .val{font-size:15px;font-weight:700;color:var(--accent);display:block;}
+.stat-chip .lbl{font-size:10px;opacity:.65;}
+
+/* TOOLBAR */
+.toolbar{background:var(--card);padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:76px;z-index:39;}
+.btn{padding:9px 14px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:'Cairo',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+.btn:active{transform:scale(.96);}
+.btn-add{background:var(--blue);color:white;flex:1;justify-content:center;}
+.btn-clear{background:#fee2e2;color:var(--red);}
+.btn-print{background:#f1f5f9;color:var(--muted);}
+.btn-del{background:#fee2e2;color:var(--red);padding:7px 11px;font-size:14px;border-radius:7px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;}
+
+/* CUSTOMER BAR */
+.customer-bar{background:#fffbf0;border-bottom:2px solid #fcd34d;padding:10px 12px;display:flex;align-items:center;gap:10px;position:sticky;top:127px;z-index:38;}
+.customer-label{font-size:12px;font-weight:700;color:#92400e;white-space:nowrap;flex-shrink:0;}
+.customer-input{flex:1;padding:8px 12px;border:1.5px solid #fcd34d;border-radius:8px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;background:white;outline:none;color:var(--navy);max-width:320px;}
+.customer-input:focus{border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+.customer-input::placeholder{color:#94a3b8;font-weight:400;}
+
+/* DISCOUNT BAR */
+.disc-bar{background:var(--card);border-bottom:2px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:175px;z-index:37;}
+.disc-bar-label{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.disc-toggle-group{display:flex;background:#f1f5f9;border-radius:9px;padding:3px;gap:2px;flex-shrink:0;}
+.disc-toggle{padding:7px 13px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Cairo',sans-serif;color:var(--muted);background:transparent;transition:all .2s;white-space:nowrap;touch-action:manipulation;}
+.disc-toggle:hover{color:var(--blue);background:rgba(26,58,110,.06);}
+.disc-toggle.active{background:var(--navy);color:var(--accent);box-shadow:0 2px 8px rgba(10,22,40,.25);}
+.manual-cells{display:none;align-items:center;gap:8px;flex-wrap:wrap;animation:fadeIn .2s ease;}
+.manual-cells.visible{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
+.manual-cell{display:flex;align-items:center;gap:5px;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:8px;padding:5px 10px;}
+.manual-cell-label{font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;}
+.manual-cell-input{width:58px;padding:5px 6px;border:1.5px solid #f59e0b;border-radius:6px;font-size:14px;font-weight:700;font-family:'Cairo',sans-serif;text-align:center;color:var(--navy);background:white;outline:none;-webkit-appearance:none;appearance:none;}
+.manual-cell-input:focus{border-color:#d97706;box-shadow:0 0 0 2px rgba(217,119,6,.2);}
+.manual-cell-pct{font-size:13px;font-weight:700;color:#92400e;}
+
+/* MAIN */
+.main{padding:12px;padding-bottom:60px;}
+
+/* MOBILE CARDS */
+.inv-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.inv-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:12px 14px;}
+.inv-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.inv-num{background:var(--navy);color:var(--accent);font-size:12px;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.inv-card-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;}
+.field-label{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+.inv-total-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.total-label{font-size:12px;color:var(--muted);font-weight:600;}
+.total-value{font-size:18px;font-weight:900;color:var(--navy);}
+
+/* DESKTOP TABLE */
+.desktop-wrap{display:none;}
+
+/* EMPTY */
+.empty-state{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);text-align:center;padding:50px 20px;color:var(--muted);}
+.empty-icon{font-size:44px;margin-bottom:10px;}
+.empty-text{font-size:15px;font-weight:700;}
+.empty-sub{font-size:12px;margin-top:5px;color:#94a3b8;}
+
+/* SEARCH MODAL */
+.search-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,22,40,.5);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);align-items:flex-start;}
+.search-overlay.active{display:flex;flex-direction:column;}
+.search-modal{background:white;width:100%;border-radius:0 0 16px 16px;overflow:hidden;display:flex;flex-direction:column;max-height:85vh;box-shadow:0 20px 60px rgba(10,22,40,.4);}
+.search-modal-header{padding:12px 16px;background:var(--navy);display:flex;align-items:center;gap:10px;}
+.search-modal-input{flex:1;padding:10px 14px;border:none;border-radius:8px;font-size:16px;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;outline:none;background:white;}
+.search-modal-cancel{background:rgba(255,255,255,.15);color:white;border:none;border-radius:7px;padding:9px 13px;font-size:12px;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;flex-shrink:0;}
+.search-results{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.sug-item{padding:13px 16px;cursor:pointer;font-size:14px;text-align:right;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;gap:10px;touch-action:manipulation;}
+.sug-item:active{background:#eff6ff;}
+.sug-item:last-child{border-bottom:none;}
+.sug-name{font-weight:600;color:var(--text);}
+.sug-src{font-size:11px;color:#94a3b8;flex-shrink:0;white-space:nowrap;}
+.sug-empty{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+/* INPUTS */
+.item-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;background:#f8faff;outline:none;cursor:pointer;-webkit-user-select:none;user-select:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-input.filled{background:white;border-color:#86b3d6;color:var(--navy);font-weight:600;}
+.src-select{width:100%;padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Cairo',sans-serif;font-weight:700;outline:none;cursor:pointer;background:white;-webkit-appearance:none;appearance:none;text-align:center;}
+.src-badge{display:inline-block;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;width:100%;text-align:center;}
+.src-luzi{background:#dbeafe;color:#1d4ed8;}
+.src-lotus{background:#ede9fe;color:#6d28d9;}
+.price-disp{padding:9px 8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:700;color:var(--blue);background:#f0f7ff;text-align:center;width:100%;}
+.qty-input{width:100%;padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:'Cairo',sans-serif;text-align:center;outline:none;background:white;-webkit-appearance:none;appearance:none;}
+.qty-input:focus{border-color:var(--blue);}
+
+/* SUMMARY */
+.summary-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
+.summary-title{background:var(--navy);color:var(--accent);padding:12px 16px;font-size:14px;font-weight:700;}
+.sum-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #f1f5f9;gap:10px;}
+.sum-row:last-child{border-bottom:none;}
+.sum-row-label{flex:1;font-size:13px;color:var(--muted);font-weight:600;}
+.sum-row-val{font-size:14px;font-weight:700;color:var(--text);}
+.disc-badge{display:inline-block;background:#dcfce7;color:#166534;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;}
+.manual-badge{display:inline-block;background:#fef3c7;color:#92400e;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;}
+.grand-box{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:var(--radius);padding:20px;color:white;box-shadow:var(--shadow);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.grand-label{font-size:12px;opacity:.7;margin-bottom:4px;}
+.grand-amount{font-size:28px;font-weight:900;color:var(--accent);line-height:1;}
+.grand-currency{font-size:13px;opacity:.75;margin-top:2px;}
+.grand-saving-label{font-size:11px;opacity:.65;margin-bottom:4px;}
+.grand-saving{font-size:16px;font-weight:700;color:#86efac;}
+.tiers-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:16px;transition:opacity .3s;}
+.tiers-card.dimmed{opacity:.35;pointer-events:none;}
+.tiers-inner{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tier-group h4{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+.tier-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #f8faff;}
+.tier-row:last-child{border-bottom:none;}
+.tier-row .pct{font-weight:700;color:var(--green);}
+
+/* RESPONSIVE */
+@media(min-width:768px){
+  .inv-cards{display:none!important;}
+  .desktop-wrap{display:block!important;}
+  .main{padding:20px 32px 40px;max-width:1400px;margin:0 auto;}
+  .toolbar{top:72px;padding:12px 32px;}
+  .customer-bar{top:120px;padding:10px 32px;}
+  .disc-bar{top:168px;padding:10px 32px;}
+  .btn-add{flex:none;}
+  .summary-grid{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;}
+  .grand-box{flex-direction:column;align-items:flex-start;}
+  .mob-sum-wrap{display:none;}
+  .desk-sum-wrap{display:block;}
+}
+@media(max-width:767px){
+  .inv-cards{display:flex!important;}
+  .desktop-wrap{display:none!important;}
+  .mob-sum-wrap{display:block;}
+  .desk-sum-wrap{display:none;}
+  .summary-grid{display:block;}
+  .disc-bar{flex-wrap:wrap;top:175px;}
+  .manual-cells{width:100%;}
+  .customer-bar{top:127px;}
+}
+
+/* DESKTOP TABLE */
+.desktop-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:visible;margin-bottom:24px;}
+.desktop-wrap table{width:100%;border-collapse:collapse;}
+.desktop-wrap thead{background:var(--navy);}
+.desktop-wrap thead th{color:rgba(255,255,255,.9);font-size:13px;font-weight:700;padding:12px 10px;text-align:center;white-space:nowrap;}
+.desktop-wrap thead th.col-name{text-align:right;padding-right:14px;}
+.desktop-wrap tbody tr{border-bottom:1px solid var(--border);}
+.desktop-wrap tbody tr:last-child{border-bottom:none;}
+.desktop-wrap tbody tr:hover{background:#f8faff;}
+.desktop-wrap tbody td{padding:7px 10px;font-size:14px;vertical-align:middle;text-align:center;overflow:visible;}
+.desktop-wrap tbody td.col-name{text-align:right;padding-right:12px;overflow:visible;}
+.col-name{min-width:280px;}.col-src{width:100px;}.col-price{width:115px;}
+.col-qty{width:100px;}.col-total{width:125px;}.col-act{width:52px;}
+.row-num-cell{width:44px;font-weight:700;color:var(--muted);font-size:13px;}
+.row-total{font-weight:700;color:var(--navy);}
+.desktop-picker{position:relative;}
+.desktop-input{width:100%;padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:14px;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;background:#f8faff;outline:none;transition:border-color .15s;}
+.desktop-input:focus{border-color:var(--blue);background:white;}
+.desktop-input.filled{background:white;border-color:#86b3d6;}
+.desktop-sug{position:fixed;background:white;border:1.5px solid var(--border);border-radius:10px;max-height:260px;overflow-y:auto;z-index:99999;box-shadow:0 10px 40px rgba(10,22,40,.18);display:none;min-width:280px;}
+.desktop-sug .sug-item{font-size:13px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;}
+.desktop-sug .sug-item:hover{background:#eff6ff;cursor:pointer;}
+.desktop-price{padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:14px;font-weight:600;color:var(--blue);background:#f0f7ff;text-align:center;width:100%;}
+.desktop-qty{padding:7px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:14px;font-family:'Cairo',sans-serif;width:85px;text-align:center;outline:none;}
+.desktop-qty:focus{border-color:var(--blue);}
+.desktop-src{padding:6px 6px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'Cairo',sans-serif;font-weight:600;width:90px;outline:none;cursor:pointer;}
+.desk-sum-table{width:100%;border-collapse:collapse;}
+.desk-sum-table th{background:#f8faff;color:var(--muted);font-size:12px;font-weight:700;padding:10px 14px;text-align:center;border-bottom:1px solid var(--border);}
+.desk-sum-table td{padding:11px 14px;font-size:14px;text-align:center;border-bottom:1px solid #f1f5f9;}
+.desk-sum-table tbody tr:last-child td{border-bottom:none;}
+.desk-sum-table tfoot td{background:#1a3a6e;color:white;font-weight:700;font-size:14px;padding:12px 14px;}
+
+/* ══════════ PRINT ══════════ */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  body{background:white!important;font-size:12px;direction:rtl;}
+  .toolbar,.btn-del,.col-act,.search-overlay,.inv-cards,.tiers-card,.header,.disc-bar,.customer-bar{display:none!important;}
+  .print-header{display:flex!important;}
+  .print-customer-block{display:block!important;}
+  .desktop-wrap{display:block!important;box-shadow:none!important;border:1px solid #ccc!important;border-radius:6px!important;margin-bottom:16px!important;}
+  .mob-sum-wrap{display:none!important;}
+  .desk-sum-wrap{display:block!important;}
+  .main{padding:0!important;max-width:100%!important;}
+  .summary-grid{display:grid!important;grid-template-columns:1fr 240px!important;gap:12px!important;}
+  .summary-card{box-shadow:none!important;border:1px solid #ccc!important;page-break-inside:avoid;}
+  .grand-box{box-shadow:none!important;background:linear-gradient(135deg,#0a1628 0%,#1a3a6e 100%)!important;border-radius:8px!important;flex-direction:column!important;align-items:flex-start!important;}
+  .desktop-wrap thead{background:#0a1628!important;}
+  .desktop-wrap thead th{color:white!important;font-size:11px!important;padding:8px 6px!important;}
+  .desktop-wrap tbody td{font-size:11px!important;padding:6px!important;}
+  .desk-sum-table tfoot td{background:#1a3a6e!important;color:white!important;}
+  @page{size:A4 landscape;margin:12mm 10mm;}
+}
+
+/* PRINT HEADER */
+.print-header{display:none;align-items:center;gap:16px;padding-bottom:12px;margin-bottom:10px;border-bottom:3px solid #0a1628;}
+.print-logo{width:65px;height:65px;object-fit:contain;border-radius:8px;}
+.print-company-name{font-size:20px;font-weight:900;color:#0a1628;}
+.print-company-sub{font-size:12px;color:#64748b;margin-top:2px;}
+.print-invoice-num{background:#0a1628;color:#c8a95b;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;margin-top:5px;display:inline-block;}
+
+/* PRINT CUSTOMER BLOCK */
+.print-customer-block{
+  display:none;
+  background:#fffbf0;
+  border:1.5px solid #fcd34d;
+  border-radius:8px;
+  padding:10px 16px;
+  margin-bottom:14px;
+  display:none;
+  flex-direction:row;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.print-customer-block .pcb-item{display:flex;align-items:center;gap:8px;}
+.print-customer-block .pcb-label{font-size:12px;font-weight:700;color:#92400e;}
+.print-customer-block .pcb-value{font-size:14px;font-weight:900;color:#0a1628;}
+.print-customer-block .pcb-disc{display:flex;gap:12px;}
+.print-disc-pill{background:#dcfce7;color:#166534;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;}
+.print-disc-pill.manual{background:#fef3c7;color:#92400e;}
+.print-disc-pill.none{background:#f1f5f9;color:#64748b;}
+
+/* PRINT DISCLAIMER */
+.print-disclaimer {
+  display: none;
+}
+@media print {
+  .print-disclaimer {
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: #64748b;
+    font-style: italic;
+    border-top: 1px dashed #cbd5e1;
+    margin-top: 14px;
+    padding-top: 8px;
+    letter-spacing: 0.2px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PRINT HEADER ══ -->
+<div class="print-header">
+  <img class="print-logo" src="data:image/png;base64,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" alt="طيبة">
+  <div style="flex:1;">
+    <div class="print-company-name">مجموعة طيبة للعطور</div>
+    <div class="print-company-sub">عرض سعر — لوزى ولوتس</div>
+  </div>
+  <div style="text-align:left;font-size:12px;color:#64748b;">
+    <div>التاريخ: <b id="print-date"></b></div>
+    <div class="print-invoice-num" id="print-num">عرض سعر #001</div>
+  </div>
+</div>
+
+<!-- ══ PRINT CUSTOMER BLOCK ══ -->
+<div class="print-customer-block" id="print-customer-block">
+  <div class="pcb-item">
+    <span class="pcb-label">👤 العميل:</span>
+    <span class="pcb-value" id="print-customer-name">—</span>
+  </div>
+  <div class="pcb-item">
+    <span class="pcb-label">🏷️ الخصم المطبق:</span>
+    <div class="pcb-disc" id="print-disc-pills"></div>
+  </div>
+</div>
+
+
+<!-- PRINT DISCLAIMER -->
+<div class="print-disclaimer">
+  الأسعار الواردة ببيان التسعير هي أسعار استرشادية قابلة للتعديل، ولا تُعد نهائية إلا بعد صدور الفاتورة الرئيسية المعتمدة
+</div>
+
+<!-- ══ SCREEN HEADER ══ -->
+<div class="header">
+  <img class="header-logo" src="data:image/png;base64,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" alt="طيبة">
+  <div class="header-brand">
+    <div class="header-title">مجموعة طيبة للعطور</div>
+    <div class="header-sub">عرض سعر • لوزى ولوتس</div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-chip"><span class="val" id="h-items">0</span><span class="lbl">أصناف</span></div>
+    <div class="stat-chip"><span class="val" id="h-total">0</span><span class="lbl">جنيه</span></div>
+  </div>
+</div>
+
+<!-- ══ TOOLBAR ══ -->
+<div class="toolbar">
+  <button class="btn btn-add" onclick="addRow()">➕ إضافة صنف</button>
+  <button class="btn btn-clear" onclick="clearAll()">🗑️ مسح</button>
+  <button class="btn btn-print" onclick="printWithName()">🖨️ PDF</button>
+  <div id="filename-hint" style="display:none;align-items:center;gap:6px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#166534;cursor:pointer;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" onclick="copyFilename()" title="اضغط للنسخ">
+    <span>📋</span><span id="filename-text"></span>
+  </div>
+</div>
+
+<!-- ══ CUSTOMER BAR ══ -->
+<div class="customer-bar">
+  <span class="customer-label">👤 اسم العميل:</span>
+  <input class="customer-input" id="customer-name" type="text"
+    placeholder="اكتب اسم العميل هنا..."
+    oninput="updatePrintCustomer();updateFilenameHint();">
+</div>
+
+<!-- ══ DISCOUNT BAR ══ -->
+<div class="disc-bar">
+  <span class="disc-bar-label">🏷️ الخصم:</span>
+  <div class="disc-toggle-group">
+    <button class="disc-toggle active" id="t-auto"   onclick="setMode('auto')">⚡ تلقائى</button>
+    <button class="disc-toggle"        id="t-none"   onclick="setMode('none')">🚫 بدون خصم</button>
+    <button class="disc-toggle"        id="t-manual" onclick="setMode('manual')">✏️ يدوى</button>
+  </div>
+  <div class="manual-cells" id="manual-cells">
+    <div class="manual-cell">
+      <span class="manual-cell-label">لوزى</span>
+      <input class="manual-cell-input" id="disc-luzi" type="number" min="0" max="100" step="0.5" value="0" inputmode="decimal" placeholder="0" oninput="updateSummary()">
+      <span class="manual-cell-pct">%</span>
+    </div>
+    <div class="manual-cell">
+      <span class="manual-cell-label">لوتس</span>
+      <input class="manual-cell-input" id="disc-lotus" type="number" min="0" max="100" step="0.5" value="0" inputmode="decimal" placeholder="0" oninput="updateSummary()">
+      <span class="manual-cell-pct">%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEARCH MODAL ══ -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-modal">
+    <div class="search-modal-header">
+      <input class="search-modal-input" id="searchModalInput" type="search" placeholder="ابحث عن صنف..." autocomplete="off" oninput="filterModal(this.value)">
+      <button class="search-modal-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- MOBILE CARDS -->
+  <div class="inv-cards" id="inv-cards">
+    <div id="empty-mob" class="empty-state">
+      <div class="empty-icon">🧴</div><div class="empty-text">ابدأ عرض السعر</div>
+      <div class="empty-sub">اضغط "إضافة صنف" للبدء</div>
+    </div>
+  </div>
+
+  <!-- DESKTOP TABLE -->
+  <div class="desktop-wrap" id="desktop-wrap">
+    <table>
+      <thead><tr>
+        <th class="row-num-cell">#</th>
+        <th class="col-name" style="text-align:right;padding-right:14px">اسم الصنف</th>
+        <th class="col-src">المصدر</th>
+        <th class="col-price">السعر (جنيه)</th>
+        <th class="col-qty">الكمية (كجم)</th>
+        <th class="col-total">الإجمالى</th>
+        <th class="col-act"></th>
+      </tr></thead>
+      <tbody id="inv-body"></tbody>
+    </table>
+    <div id="empty-desk" class="empty-state" style="display:none;">
+      <div class="empty-icon">🧴</div><div class="empty-text">ابدأ عرض السعر</div>
+      <div class="empty-sub">اضغط "إضافة صنف" للبدء</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="summary" style="display:none;">
+    <div class="summary-grid">
+      <div>
+        <div class="summary-card desk-sum-wrap">
+          <div class="summary-title">📊 ملخص حسب المصدر</div>
+          <table class="desk-sum-table">
+            <thead><tr><th>المصدر</th><th>الكمية (كجم)</th><th>إجمالى المبلغ</th><th>الخصم</th><th>بعد الخصم</th></tr></thead>
+            <tbody id="sum-body"></tbody>
+            <tfoot><tr>
+              <td>الإجمالى</td>
+              <td id="f-qty">—</td><td id="f-amt">—</td>
+              <td id="f-saved">—</td><td id="f-final">—</td>
+            </tr></tfoot>
+          </table>
+        </div>
+        <div class="mob-sum-wrap" id="mob-sum-cards"></div>
+        <div class="tiers-card" id="tiers-card" style="margin-top:12px;">
+          <div class="summary-title" style="font-size:13px;padding:10px 16px;">🏷️ شرائح الخصم التلقائية</div>
+          <div class="tiers-inner">
+            <div class="tier-group">
+              <h4>لوزى</h4>
+              <div class="tier-row"><span>من 0.1 كجم</span><span class="pct">2%</span></div>
+              <div class="tier-row"><span>من 1 كجم</span><span class="pct">3%</span></div>
+              <div class="tier-row"><span>من 3 كجم</span><span class="pct">4%</span></div>
+              <div class="tier-row"><span>من 5 كجم</span><span class="pct">5%</span></div>
+              <div class="tier-row"><span>من 10 كجم</span><span class="pct">6%</span></div>
+              <div class="tier-row"><span>من 20 كجم</span><span class="pct">7%</span></div>
+              <div class="tier-row"><span>من 25 كجم</span><span class="pct">8%</span></div>
+            </div>
+            <div class="tier-group">
+              <h4>لوتس</h4>
+              <div class="tier-row"><span>من 0.1 كجم</span><span class="pct">7%</span></div>
+              <div class="tier-row"><span>من 0.5 كجم</span><span class="pct">9%</span></div>
+              <div class="tier-row"><span>من 1 كجم</span><span class="pct">12%</span></div>
+              <div class="tier-row"><span>من 5 كجم</span><span class="pct">15%</span></div>
+              <div class="tier-row"><span>من 10 كجم</span><span class="pct">17%</span></div>
+              <div class="tier-row"><span>من 20 كجم</span><span class="pct">18%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grand-box">
+        <div>
+          <div class="grand-label">الإجمالى النهائى بعد الخصم</div>
+          <div class="grand-amount" id="grand-amount">0</div>
+          <div class="grand-currency">جنيه مصرى</div>
+        </div>
+        <div>
+          <div class="grand-saving-label">💰 إجمالى التوفير</div>
+          <div class="grand-saving" id="grand-saved2">0 جنيه</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATALOG = [{"n": "212 VIP I LOVE NY", "s": {"لوتس": 4550.0}}, {"n": "40 عقده", "s": {"لوزى": 10550.0}}, {"n": "5فلورال امبر سنشوال مسك", "s": {"لوتس": 18975.0}}, {"n": "9بى ام", "s": {"لوزى": 5555.0}}, {"n": "أرمانى اروما", "s": {"لوزى": 5975.0}}, {"n": "أرمانى مانيا", "s": {"لوزى": 5950.0}}, {"n": "أسكادا سكسى جرافتى", "s": {"لوزى": 4250.0}}, {"n": "أسكادا كوليكشن*", "s": {"لوزى": 7100.0}}, {"n": "أكس لارج", "s": {"لوزى": 5750.0}}, {"n": "أليان", "s": {"لوزى": 7300.0}}, {"n": "أماريج", "s": {"لوزى": 6850.0}}, {"n": "أماريج ماريج-B", "s": {"لوزى": 6500.0}}, {"n": "أمور أمور *", "s": {"لوزى": 6950.0}}, {"n": "أمورى كافيه", "s": {"لوتس": 9775.0}}, {"n": "أنجل", "s": {"لوزى": 6950.0}}, {"n": "أندروميدا", "s": {"لوزى": 10750.0}}, {"n": "أوبيوم W", "s": {"لوزى": 6500.0}}, {"n": "أوديسى كاندى-ارماف", "s": {"لوزى": 4650.0}}, {"n": "أورجانزا -B", "s": {"لوزى": 5700.0}}, {"n": "أورجانزا*", "s": {"لوزى": 6850.0}}, {"n": "أوريانا", "s": {"لوزى": 6500.0}}, {"n": "أوشن دريم", "s": {"لوزى": 5995.0}}, {"n": "أومبر نوماد", "s": {"لوتس": 5750.0}}, {"n": "أيسمياكى W", "s": {"لوزى": 6850.0}}, {"n": "أيفوريا W", "s": {"لوزى": 5555.0}}, {"n": "أيكونيك", "s": {"لوزى": 5950.0}}, {"n": "أيلى صعب", "s": {"لوزى": 6950.0}}, {"n": "ابسوليو افنتس", "s": {"لوزى": 9250.0}}, {"n": "ابل براندى اون ذا روكس", "s": {"لوتس": 16750.0}}, {"n": "ات ذا بيتش", "s": {"لوزى": 3550.0}}, {"n": "اترنتى امبر اسنس", "s": {"لوتس": 4850.0}}, {"n": "اتش 24 هيرميس", "s": {"لوزى": 9850.0}}, {"n": "اديداس تو داي", "s": {"لوتس": 4450.0}}, {"n": "ارابيان تونكا", "s": {"لوزى": 6500.0}}, {"n": "ارابيان تونكا مونتال", "s": {"لوتس": 16750.0}}, {"n": "اربا بورا", "s": {"لوزى": 11500.0}}, {"n": "اربابورا", "s": {"لوتس": 6200.0}}, {"n": "اربابورا-A", "s": {"لوزى": 8750.0}}, {"n": "ارباورا*", "s": {"لوتس": 6500.0}}, {"n": "ارجينتينا", "s": {"لوزى": 9300.0}}, {"n": "ارزه لبنان", "s": {"لوتس": 5650.0}}, {"n": "ارمانى بريفى نوار كوجين", "s": {"لوتس": 21275.0}}, {"n": "ازارو ونتد", "s": {"لوتس": 4450.0}}, {"n": "اسد اليكسير", "s": {"لوزى": 4250.0}}, {"n": "اسد بور بون لطافة", "s": {"لوتس": 4550.0}}, {"n": "اسنشيال سبورت", "s": {"لوزى": 5350.0}}, {"n": "افترنون سويم", "s": {"لوزى": 5850.0}}, {"n": "اكس بيس", "s": {"لوتس": 4250.0}}, {"n": "اكس شيكولاته", "s": {"لوزى": 4975.0}}, {"n": "اكسريوس روج", "s": {"لوزى": 6400.0}}, {"n": "اكلير / لطافه", "s": {"لوتس": 4500.0}}, {"n": "اكوا اتلانتك", "s": {"لوتس": 4250.0}}, {"n": "اكوا دى جيو", "s": {"لوتس": 3400.0}}, {"n": "اكوا دى جيو بروفوندو لايتس", "s": {"لوتس": 4350.0}}, {"n": "اكوا سيليستا", "s": {"لوزى": 9850.0}}, {"n": "اكوا مندرينو", "s": {"لوزى": 7250.0}}, {"n": "ال في لفرز", "s": {"لوتس": 21275.0}}, {"n": "ال كليف كريستيان", "s": {"لوزى": 16200.0}}, {"n": "الاسطورة-اجمل", "s": {"لوزى": 11500.0}}, {"n": "الترامارين", "s": {"لوزى": 5555.0, "لوتس": 3650.0}}, {"n": "الترامال", "s": {"لوتس": 4275.0}}, {"n": "الثائر", "s": {"لوزى": 7750.0}}, {"n": "الرمال", "s": {"لوزى": 12750.0}}, {"n": "الشيخ الابيض", "s": {"لوزى": 11750.0}}, {"n": "العلا", "s": {"لوتس": 19500.0}}, {"n": "الكسندريا اورينتال", "s": {"لوزى": 11759.0}}, {"n": "الوعد", "s": {"لوزى": 8500.0}}, {"n": "اليان رجالى", "s": {"لوزى": 6995.0}}, {"n": "اليسيوم بور اوم", "s": {"لوزى": 10750.0}}, {"n": "اليكسندريا 2", "s": {"لوزى": 10750.0}}, {"n": "اليكسندريا2", "s": {"لوتس": 7750.0}}, {"n": "اليور اوم سبورت سوبر ليجرا", "s": {"لوزى": 7750.0}}, {"n": "اليور سبورت", "s": {"لوزى": 6750.0, "لوتس": 5175.0}}, {"n": "امبر بلدسيرينى*", "s": {"لوزى": 7150.0}}, {"n": "امبر نوى", "s": {"لوتس": 5950.0}}, {"n": "امبريال فالى", "s": {"لوزى": 6950.0, "لوتس": 19950.0}}, {"n": "اميرة العرب", "s": {"لوزى": 4100.0}}, {"n": "اميريس فام", "s": {"لوتس": 11500.0}}, {"n": "ان فيت اونلى امبر 23 كيالى", "s": {"لوتس": 4850.0}}, {"n": "ان موشن", "s": {"لوزى": 8250.0}}, {"n": "انترلود للرجال", "s": {"لوزى": 12250.0}}, {"n": "انترلود للنساء", "s": {"لوزى": 10750.0}}, {"n": "انجل او ديمون", "s": {"لوزى": 5950.0}}, {"n": "انجليز شير", "s": {"لوزى": 11500.0}}, {"n": "اندليس لاف", "s": {"لوتس": 3950.0}}, {"n": "انسمبل", "s": {"لوزى": 9690.0}}, {"n": "انسولو", "s": {"لوتس": 10950.0}}, {"n": "انفكتس", "s": {"لوزى": 5750.0}}, {"n": "انفكتس فيكتورى اليكسير", "s": {"لوتس": 4550.0}}, {"n": "انفكتوس", "s": {"لوتس": 3850.0}}, {"n": "انكريدبل هوت", "s": {"لوزى": 4500.0}}, {"n": "انكور نوار", "s": {"لوزى": 15100.0}}, {"n": "انى نيشان", "s": {"لوتس": 16675.0}}, {"n": "او دو نايت بوروم", "s": {"لوزى": 6758.0}}, {"n": "اوبن *", "s": {"لوزى": 6350.0}}, {"n": "اوتومن فايبس", "s": {"لوتس": 11375.0}}, {"n": "اوجان", "s": {"لوزى": 4200.0}}, {"n": "اوراج", "s": {"لوتس": 9775.0}}, {"n": "اورجانزا", "s": {"لوتس": 2950.0}}, {"n": "اوريون", "s": {"لوتس": 4640.0}}, {"n": "اوشن ميست", "s": {"لوزى": 5950.0}}, {"n": "اوفر تور", "s": {"لوزى": 12000.0}}, {"n": "اوفر دوز", "s": {"لوزى": 12750.0}}, {"n": "اول اف مى", "s": {"لوتس": 4350.0}}, {"n": "اوليمبيا", "s": {"لوتس": 3950.0}}, {"n": "اومبر ليزر", "s": {"لوزى": 11500.0}}, {"n": "ايبيك", "s": {"لوزى": 8750.0}}, {"n": "ايبين فوم", "s": {"لوتس": 19950.0}}, {"n": "ايدن", "s": {"لوزى": 7500.0}}, {"n": "ايدول", "s": {"لوزى": 5975.0}}, {"n": "ايديل جيرلان", "s": {"لوزى": 5750.0}}, {"n": "ايروس انرجى", "s": {"لوزى": 5700.0}}, {"n": "ايروس نجيم", "s": {"لوزى": 5200.0}}, {"n": "ايريش ليزر", "s": {"لوزى": 11750.0}}, {"n": "ايسمياكى M", "s": {"لوزى": 6995.0}}, {"n": "ايطاليان سيبريس", "s": {"لوزى": 17800.0}}, {"n": "ايطاليان ليزر", "s": {"لوزى": 10750.0}}, {"n": "ايفوريا M", "s": {"لوزى": 6250.0}}, {"n": "ايفوريا انتنس", "s": {"لوزى": 6995.0}}, {"n": "ايكلات دى اربج", "s": {"لوزى": 6850.0}}, {"n": "ايلى صعب لو بارفام", "s": {"لوتس": 3750.0}}, {"n": "ايلي صعب", "s": {"لوتس": 3650.0}}, {"n": "ايماجينيشن", "s": {"لوتس": 14850.0}}, {"n": "باد بوى", "s": {"لوتس": 4750.0}}, {"n": "بار فانيليا", "s": {"لوزى": 4500.0}}, {"n": "بارادوكس", "s": {"لوزى": 6950.0}}, {"n": "بارتى لاف اسكادا", "s": {"لوزى": 5555.0}}, {"n": "بارتي", "s": {"لوتس": 3950.0}}, {"n": "باروندا", "s": {"لوزى": 21000.0}}, {"n": "باريس *", "s": {"لوزى": 4650.0}}, {"n": "باريس باسبورت *", "s": {"لوزى": 6500.0}}, {"n": "باريس فينس", "s": {"لوتس": 6655.0}}, {"n": "باريس هيلتون", "s": {"لوزى": 5300.0}}, {"n": "باسيفك شيل", "s": {"لوتس": 5555.0}}, {"n": "باشا كارتير", "s": {"لوزى": 6950.0}}, {"n": "باشن فور عود", "s": {"لوتس": 16000.0}}, {"n": "باشن مسك", "s": {"لوزى": 5950.0}}, {"n": "بالاس / الجزيره", "s": {"لوزى": 12500.0}}, {"n": "بانانا سيلك", "s": {"لوزى": 5950.0}}, {"n": "باودر بلاش", "s": {"لوزى": 5950.0}}, {"n": "باى جفنشى", "s": {"لوزى": 5950.0}}, {"n": "باى ذا فاير بلاس", "s": {"لوتس": 14500.0}}, {"n": "باينبول", "s": {"لوزى": 5800.0}}, {"n": "بخور*", "s": {"لوزى": 3950.0}}, {"n": "بديع العود بنك", "s": {"لوزى": 3950.0}}, {"n": "برادا كاربون", "s": {"لوتس": 4600.0}}, {"n": "برايت كريستال", "s": {"لوزى": 5750.0}}, {"n": "برايت كريستال ابسوليو", "s": {"لوتس": 4450.0}}, {"n": "بربرى بدى A", "s": {"لوزى": 6850.0}}, {"n": "بربرى بريت M", "s": {"لوزى": 6850.0}}, {"n": "بربرى جولد", "s": {"لوزى": 3950.0}}, {"n": "بربرى سبورت", "s": {"لوزى": 7150.0}}, {"n": "بربرى لندن", "s": {"لوزى": 5555.0}}, {"n": "بربرى هير w", "s": {"لوزى": 5555.0}}, {"n": "بربرى هير*", "s": {"لوتس": 4105.0}}, {"n": "بربرى هيرو", "s": {"لوتس": 4350.0}}, {"n": "بربريز", "s": {"لوزى": 6400.0}}, {"n": "بربل عود", "s": {"لوزى": 9650.0}}, {"n": "بريبروجريتيف", "s": {"لوزى": 5555.0}}, {"n": "بريق", "s": {"لوتس": 4450.0}}, {"n": "بكارات روج", "s": {"لوتس": 6500.0}}, {"n": "بكارات روج 540", "s": {"لوزى": 5750.0}}, {"n": "بكارات روج P", "s": {"لوتس": 9775.0}}, {"n": "بكارات روج اكستريه", "s": {"لوزى": 9950.0}}, {"n": "بكارات روج اكستريه *", "s": {"لوزى": 11500.0}}, {"n": "بلاتنيوم", "s": {"لوزى": 5555.0}}, {"n": "بلاتين", "s": {"لوزى": 5750.0}}, {"n": "بلاك افغانو", "s": {"لوزى": 18975.0, "لوتس": 12350.0}}, {"n": "بلاك اكس اس", "s": {"لوتس": 4400.0}}, {"n": "بلاك اكس اس M", "s": {"لوزى": 4950.0}}, {"n": "بلاك اكس اس W", "s": {"لوزى": 6150.0}}, {"n": "بلاك اكس اس بوشن حريمى", "s": {"لوزى": 5950.0}}, {"n": "بلاك اكس اس بوشن رجالى", "s": {"لوزى": 6500.0}}, {"n": "بلاك اكس اس لكسيس حريمى", "s": {"لوزى": 6350.0}}, {"n": "بلاك اكس اس لكسيس رجالى", "s": {"لوزى": 5350.0}}, {"n": "بلاك اكس اس ليكزس", "s": {"لوتس": 3950.0}}, {"n": "بلاك اوبيوم", "s": {"لوتس": 3950.0}}, {"n": "بلاك اوبيوم اوفر ريد", "s": {"لوزى": 4500.0}}, {"n": "بلاك اوبيوم فلورال شوك", "s": {"لوتس": 3750.0}}, {"n": "بلاك اوركيد", "s": {"لوتس": 4950.0}}, {"n": "بلاك جوافه", "s": {"لوتس": 13500.0}}, {"n": "بلاك عود", "s": {"لوزى": 6975.0, "لوتس": 5555.0}}, {"n": "بلاك كشمير", "s": {"لوزى": 8500.0}}, {"n": "بلاك كود*", "s": {"لوزى": 6500.0}}, {"n": "بلاك ليكر", "s": {"لوزى": 11500.0, "لوتس": 16750.0}}, {"n": "بلاك مانجو", "s": {"لوتس": 16000.0}}, {"n": "بلجارى من ان بلاك", "s": {"لوزى": 6500.0}}, {"n": "بلو برى باند كيك", "s": {"لوزى": 3500.0}}, {"n": "بلو جينز *", "s": {"لوزى": 6850.0}}, {"n": "بلو دو شانيل", "s": {"لوتس": 3950.0}}, {"n": "بلو دو شانيل برفيوم", "s": {"لوتس": 4550.0}}, {"n": "بلو دو شانيل لاكسكلوسيف", "s": {"لوزى": 6500.0}}, {"n": "بلو دوشانيل", "s": {"لوزى": 6850.0}}, {"n": "بلوم مسك", "s": {"لوزى": 5950.0}}, {"n": "بليجر -B", "s": {"لوزى": 6500.0}}, {"n": "بليجر*", "s": {"لوزى": 9150.0}}, {"n": "بنادورا-A", "s": {"لوزى": 7850.0}}, {"n": "بنت الشرق", "s": {"لوتس": 4350.0}}, {"n": "بنك باى بنك", "s": {"لوزى": 4750.0}}, {"n": "بنك شوجر", "s": {"لوزى": 4500.0, "لوتس": 3600.0}}, {"n": "بوا باسيفيك / توم فورد", "s": {"لوزى": 6500.0}}, {"n": "بواتليسمان / ديور", "s": {"لوزى": 5555.0}}, {"n": "بوام", "s": {"لوزى": 4750.0}}, {"n": "بورن ان روما وومو", "s": {"لوزى": 5555.0}}, {"n": "بورن توبى انفرجتبل", "s": {"لوتس": 21250.0}}, {"n": "بوص اورنج", "s": {"لوزى": 6500.0}}, {"n": "بوص اورنج رجالى", "s": {"لوزى": 8200.0, "لوتس": 3950.0}}, {"n": "بوص بيور*", "s": {"لوزى": 7150.0}}, {"n": "بوص ذا سنت", "s": {"لوزى": 6250.0}}, {"n": "بوص ذا سنت اليكسير", "s": {"لوزى": 5555.0}}, {"n": "بوص ذا سنت ماجنتيك", "s": {"لوتس": 4550.0}}, {"n": "بوص سليكشن*", "s": {"لوزى": 8500.0}}, {"n": "بوص فام", "s": {"لوزى": 6700.0}}, {"n": "بوص نايت *", "s": {"لوزى": 7150.0}}, {"n": "بوص نايت حريمى", "s": {"لوزى": 6250.0}}, {"n": "بولو بلو", "s": {"لوزى": 7200.0}}, {"n": "بوما جام", "s": {"لوزى": 7200.0}}, {"n": "بوما سبورت", "s": {"لوزى": 5200.0}}, {"n": "بومب شيل", "s": {"لوزى": 5555.0}}, {"n": "بومب شيل جلامور", "s": {"لوزى": 4650.0}}, {"n": "بون بون كوتيور", "s": {"لوتس": 4950.0}}, {"n": "بويزون", "s": {"لوزى": 6875.0}}, {"n": "بويزون جيرل", "s": {"لوزى": 6875.0}}, {"n": "بى ام دبليو", "s": {"لوزى": 4750.0, "لوتس": 3795.0}}, {"n": "بى ديليشيوس", "s": {"لوزى": 5555.0}}, {"n": "بيانكو لاتية", "s": {"لوزى": 4500.0}}, {"n": "بيانكو لاتيه", "s": {"لوتس": 3500.0}}, {"n": "بيجاسوس", "s": {"لوزى": 10750.0}}, {"n": "بيجوس دى سول", "s": {"لوزى": 3850.0}}, {"n": "بيرسيوس", "s": {"لوتس": 29500.0}}, {"n": "بيرى جاتو", "s": {"لوزى": 5950.0}}, {"n": "بيستاشيو دريم", "s": {"لوزى": 5950.0}}, {"n": "بيستاشيو لاتية", "s": {"لوتس": 4850.0}}, {"n": "بيك", "s": {"لوتس": 11250.0}}, {"n": "بيكهام", "s": {"لوزى": 6500.0}}, {"n": "بيور XS", "s": {"لوزى": 5950.0}}, {"n": "بيور سيدكشن", "s": {"لوتس": 3850.0}}, {"n": "بيور مسك", "s": {"لوزى": 6500.0}}, {"n": "تاتش أوف بنك-B", "s": {"لوزى": 5850.0}}, {"n": "تاج صن سيت", "s": {"لوزى": 6500.0}}, {"n": "تاو-ريف", "s": {"لوزى": 4500.0}}, {"n": "تايجر", "s": {"لوتس": 15555.0}}, {"n": "ترر دو هيرمس", "s": {"لوزى": 7250.0, "لوتس": 3600.0}}, {"n": "ترياق", "s": {"لوزى": 5800.0}}, {"n": "تشانس", "s": {"لوزى": 7350.0}}, {"n": "تشانس  سبليندد", "s": {"لوتس": 4550.0}}, {"n": "تشانس او تندر", "s": {"لوزى": 7200.0}}, {"n": "تشيليز", "s": {"لوتس": 4250.0}}, {"n": "تشيليز رجالى", "s": {"لوتس": 4850.0}}, {"n": "تـوفى كراميل", "s": {"لوزى": 3350.0}}, {"n": "توباكو عود", "s": {"لوتس": 6500.0}}, {"n": "توباكو فانيل", "s": {"لوتس": 6500.0}}, {"n": "توباكو مندرينو", "s": {"لوزى": 7500.0}}, {"n": "تورينو21", "s": {"لوتس": 11250.0}}, {"n": "تورينو23", "s": {"لوتس": 11500.0}}, {"n": "توسكــا", "s": {"لوتس": 4460.0}}, {"n": "تومى فريدوم*", "s": {"لوزى": 6350.0}}, {"n": "تومى من -B", "s": {"لوزى": 5555.0}}, {"n": "تومى هيلفجر", "s": {"لوزى": 6850.0}}, {"n": "تونكا كولا/مانسيرا", "s": {"لوزى": 7750.0}}, {"n": "تى روز", "s": {"لوزى": 6950.0}}, {"n": "تيك يو وذ مى", "s": {"لوزى": 3500.0}}, {"n": "تيليا", "s": {"لوتس": 16750.0}}, {"n": "تييس كوكوا سواريه", "s": {"لوزى": 3500.0}}, {"n": "ثرى جى", "s": {"لوزى": 4500.0}}, {"n": "جاجور بلو", "s": {"لوزى": 6950.0}}, {"n": "جادور جولد", "s": {"لوتس": 3950.0}}, {"n": "جادور*", "s": {"لوزى": 5950.0}}, {"n": "جاز كلوب", "s": {"لوزى": 10950.0}}, {"n": "جاكومو  -D", "s": {"لوزى": 6950.0}}, {"n": "جان بول M", "s": {"لوزى": 7250.0}}, {"n": "جانيميد", "s": {"لوزى": 4850.0}}, {"n": "جايدانس 46", "s": {"لوتس": 22500.0}}, {"n": "جراند سوار", "s": {"لوزى": 9500.0}}, {"n": "جراى مونتاني", "s": {"لوتس": 4350.0}}, {"n": "جرىس تشارنيل", "s": {"لوتس": 17250.0}}, {"n": "جلامور", "s": {"لوزى": 5800.0}}, {"n": "جمال بالاس", "s": {"لوزى": 12250.0}}, {"n": "جوب جو*", "s": {"لوزى": 7500.0}}, {"n": "جوبليشن", "s": {"لوزى": 9950.0}}, {"n": "جوتش رش  W B", "s": {"لوزى": 5200.0}}, {"n": "جوتش رشW", "s": {"لوزى": 8950.0}}, {"n": "جوتشى باى جوتشى", "s": {"لوزى": 8500.0}}, {"n": "جوتشى بلوم", "s": {"لوتس": 4450.0}}, {"n": "جوتشى جلتى انتنس", "s": {"لوزى": 6750.0}}, {"n": "جوتشى جيتلى", "s": {"لوزى": 7250.0}}, {"n": "جوتشى رش M", "s": {"لوزى": 6500.0}}, {"n": "جوتشى عود", "s": {"لوزى": 8350.0}}, {"n": "جوتيه ديفين", "s": {"لوتس": 4550.0}}, {"n": "جود جيرل", "s": {"لوزى": 4975.0}}, {"n": "جود جيرل باد اكستريم", "s": {"لوزى": 7200.0}}, {"n": "جود جيرل دراما", "s": {"لوتس": 3750.0}}, {"n": "جورجينا(سينس)", "s": {"لوزى": 3600.0}}, {"n": "جوز هند فواكه", "s": {"لوزى": 2950.0}}, {"n": "جولد سنت", "s": {"لوزى": 5950.0}}, {"n": "جومانا", "s": {"لوتس": 4455.0}}, {"n": "جوى", "s": {"لوتس": 4255.0}}, {"n": "جى", "s": {"لوزى": 6950.0}}, {"n": "جيدانس", "s": {"لوتس": 16750.0}}, {"n": "جيرل اوف ناو", "s": {"لوزى": 5555.0}}, {"n": "جيل ساندر", "s": {"لوزى": 7250.0}}, {"n": "جيلتى الكسير لو بارفام", "s": {"لوزى": 7950.0}}, {"n": "جيلتى انتنس اوم", "s": {"لوزى": 6950.0}}, {"n": "جيمى شو", "s": {"لوتس": 4400.0}}, {"n": "جيمى شو اكزوتيك", "s": {"لوتس": 4455.0}}, {"n": "جيمى شو*", "s": {"لوتس": 6500.0}}, {"n": "جيورنى", "s": {"لوزى": 9950.0}}, {"n": "حجر اسود", "s": {"لوزى": 8500.0}}, {"n": "خمرة", "s": {"لوزى": 5850.0}}, {"n": "خمرة قهوة لطافة", "s": {"لوتس": 4750.0}}, {"n": "خمرة لطافة", "s": {"لوتس": 4750.0}}, {"n": "خمره", "s": {"لوتس": 7700.0}}, {"n": "دارك انجل", "s": {"لوتس": 4455.0}}, {"n": "دارك بلو *", "s": {"لوزى": 6500.0}}, {"n": "دارك لورد", "s": {"لوزى": 8750.0}}, {"n": "دانهل ايكون", "s": {"لوزى": 6200.0}}, {"n": "دانهل برسويت**", "s": {"لوتس": 4500.0}}, {"n": "دانهل لندن*", "s": {"لوتس": 4500.0}}, {"n": "دانهيل *", "s": {"لوزى": 8200.0}}, {"n": "دانهيل برسيوت", "s": {"لوزى": 7950.0}}, {"n": "دانهيل بلاك", "s": {"لوزى": 6950.0}}, {"n": "دانهيل سجنتشر", "s": {"لوزى": 7250.0}}, {"n": "دانهيل لندن*", "s": {"لوزى": 7200.0}}, {"n": "دراكار نوار", "s": {"لوزى": 5200.0, "لوتس": 3600.0}}, {"n": "دراكار نوار*", "s": {"لوزى": 6950.0}}, {"n": "دراى وود", "s": {"لوزى": 12500.0}}, {"n": "دريفين", "s": {"لوتس": 4500.0}}, {"n": "دعاء الجنة", "s": {"لوزى": 4650.0}}, {"n": "دلينا اكسكيلوسيف", "s": {"لوتس": 13500.0}}, {"n": "دهن عود ابيض ملكي", "s": {"لوزى": 12500.0}}, {"n": "دهن عود ابيض ملكي*", "s": {"لوزى": 17500.0}}, {"n": "دهن عود سيوفي", "s": {"لوتس": 9500.0}}, {"n": "دهن عود لاوس", "s": {"لوزى": 24500.0}}, {"n": "دولسى جابانا M", "s": {"لوزى": 8350.0}}, {"n": "دولشى", "s": {"لوزى": 5950.0}}, {"n": "ديب ريد", "s": {"لوزى": 7650.0}}, {"n": "ديب نايت", "s": {"لوزى": 5555.0}}, {"n": "ديزير", "s": {"لوتس": 4500.0}}, {"n": "ديزير -M", "s": {"لوزى": 6950.0}}, {"n": "ديزير بلو", "s": {"لوزى": 6950.0}}, {"n": "ديزيل بلاس", "s": {"لوزى": 6950.0}}, {"n": "ديزيل تاتو", "s": {"لوتس": 3750.0}}, {"n": "ديفوشن  رجالى", "s": {"لوتس": 4550.0}}, {"n": "ديفيد بيكهام اسانسيه", "s": {"لوزى": 5950.0}}, {"n": "ديفيشن", "s": {"لوتس": 4555.0}}, {"n": "ديقيلز انتريجى", "s": {"لوزى": 6500.0}}, {"n": "ديكادانس مارك جاكوب", "s": {"لوزى": 5555.0}}, {"n": "ديكلارشن", "s": {"لوزى": 7350.0}}, {"n": "ديكلاريشن", "s": {"لوتس": 4550.0}}, {"n": "ديلان بربل فيرزاتشى", "s": {"لوتس": 4555.0}}, {"n": "ديلان بلو فام", "s": {"لوتس": 4555.0}}, {"n": "ديلفيننوس", "s": {"لوزى": 6800.0}}, {"n": "ديلن بلو هووم", "s": {"لوتس": 4550.0}}, {"n": "ديلينا", "s": {"لوتس": 6500.0}}, {"n": "ديور", "s": {"لوزى": 8950.0}}, {"n": "ديور هوم انتنس", "s": {"لوزى": 9500.0}}, {"n": "ديور هوم بارفيوم 2025", "s": {"لوتس": 6950.0}}, {"n": "ذا أونلي وان 2", "s": {"لوتس": 4455.0}}, {"n": "ذا بيت", "s": {"لوزى": 6950.0}}, {"n": "ذا جيم", "s": {"لوزى": 6750.0}}, {"n": "ذا وان W", "s": {"لوزى": 5750.0}}, {"n": "ذا وان حريمى", "s": {"لوتس": 4455.0}}, {"n": "ذا وان رجالى", "s": {"لوتس": 4500.0}}, {"n": "ذا ون فور من", "s": {"لوزى": 8570.0}}, {"n": "ذا وويدنج سانتال 2023", "s": {"لوتس": 4555.0}}, {"n": "ذيس اذ هير", "s": {"لوتس": 5950.0}}, {"n": "راديانس", "s": {"لوزى": 6350.0}}, {"n": "راشن ليزر", "s": {"لوزى": 11750.0}}, {"n": "راكان", "s": {"لوزى": 11750.0}}, {"n": "رالف  *", "s": {"لوزى": 6950.0}}, {"n": "رد توباكو", "s": {"لوتس": 8950.0}}, {"n": "رقم 1 للرجال", "s": {"لوزى": 14750.0}}, {"n": "روبرتو كافالى حريمى", "s": {"لوزى": 5750.0}}, {"n": "روبرتو كافالى عود عود", "s": {"لوزى": 6950.0}}, {"n": "روج اسموكينج اكسترية", "s": {"لوتس": 6500.0}}, {"n": "روج سموكينج", "s": {"لوتس": 10950.0}}, {"n": "روح االتحاد", "s": {"لوزى": 11750.0}}, {"n": "روز أكسبوزد", "s": {"لوتس": 17850.0}}, {"n": "روز اوف نو مانز لاند", "s": {"لوتس": 15950.0}}, {"n": "روز فانيليا", "s": {"لوتس": 6500.0}}, {"n": "روز مسك", "s": {"لوزى": 11250.0}}, {"n": "روزس فانيلا", "s": {"لوزى": 8150.0}}, {"n": "روشاس *", "s": {"لوزى": 4750.0}}, {"n": "روك نروز", "s": {"لوزى": 7950.0}}, {"n": "رومبا", "s": {"لوتس": 3350.0}}, {"n": "رومبا -B", "s": {"لوزى": 5555.0}}, {"n": "رومبا -C", "s": {"لوزى": 3950.0}}, {"n": "ريسفيليوم", "s": {"لوتس": 25300.0}}, {"n": "ريف دور", "s": {"لوتس": 4555.0}}, {"n": "ريو راديانس", "s": {"لوزى": 3890.0}}, {"n": "زارا جولد", "s": {"لوتس": 4850.0}}, {"n": "زارا فورهيم", "s": {"لوتس": 4600.0}}, {"n": "زهرة الخليج", "s": {"لوتس": 9250.0}}, {"n": "زهرة الخليج-A", "s": {"لوزى": 15555.0}}, {"n": "زورو", "s": {"لوزى": 6750.0}}, {"n": "ساتين مسك", "s": {"لوزى": 5950.0}}, {"n": "سانتال بلاش", "s": {"لوزى": 11750.0}}, {"n": "سبايس بومب انفراريد", "s": {"لوزى": 5555.0}}, {"n": "سبريت", "s": {"لوزى": 6350.0}}, {"n": "سبليندد فانيلا", "s": {"لوزى": 6500.0}}, {"n": "سبورت مان", "s": {"لوزى": 7950.0}}, {"n": "سبيس بوم اكستريم", "s": {"لوزى": 6250.0}}, {"n": "سبيل اون يو", "s": {"لوتس": 6500.0}}, {"n": "ستايل / الجزيره", "s": {"لوزى": 9500.0}}, {"n": "ستروبرى باوند كيك", "s": {"لوزى": 3500.0}}, {"n": "سترونج مى", "s": {"لوتس": 4950.0}}, {"n": "سترونجر وذ يو", "s": {"لوتس": 4450.0}}, {"n": "سترونجر وذ يو توباكو", "s": {"لوزى": 5750.0}}, {"n": "ستللر تايمس", "s": {"لوتس": 25875.0}}, {"n": "سفارى", "s": {"لوزى": 7950.0}}, {"n": "سفارى اكستريم", "s": {"لوتس": 7500.0}}, {"n": "سكارليت - B", "s": {"لوزى": 5555.0}}, {"n": "سكاندال باى نايت", "s": {"لوزى": 5250.0}}, {"n": "سكاندال جان بول جوتيه", "s": {"لوزى": 5250.0}}, {"n": "سكاندال حريمى", "s": {"لوتس": 3950.0}}, {"n": "سكاندال رجالي", "s": {"لوتس": 4695.0}}, {"n": "سكرت شارم", "s": {"لوتس": 3950.0}}, {"n": "سكلبشر", "s": {"لوتس": 3750.0}}, {"n": "سكلبشر -A", "s": {"لوزى": 5250.0}}, {"n": "سكلبشر F *", "s": {"لوزى": 6150.0}}, {"n": "سكيب M", "s": {"لوزى": 4950.0}}, {"n": "سكيب حريمى", "s": {"لوتس": 3350.0}}, {"n": "سكيب فواكه", "s": {"لوزى": 4850.0}}, {"n": "سلطان العطور \"نخب أول\"", "s": {"لوزى": 22550.0}}, {"n": "سلطان العطور بريميوم", "s": {"لوتس": 8500.0}}, {"n": "سلطان العطور-A", "s": {"لوزى": 15550.0}}, {"n": "سلطان عمانى", "s": {"لوزى": 15950.0}}, {"n": "سلطانة", "s": {"لوتس": 6350.0}}, {"n": "سلفر بلاك", "s": {"لوزى": 6250.0}}, {"n": "سلفر سنت", "s": {"لوزى": 6150.0, "لوتس": 3850.0}}, {"n": "سلفر سنت-E", "s": {"لوزى": 4250.0}}, {"n": "سلفر ماونتين كريد", "s": {"لوزى": 6500.0}}, {"n": "سمر & أمور", "s": {"لوزى": 4450.0}}, {"n": "سموكينج هوت", "s": {"لوزى": 6500.0}}, {"n": "سموكينج هوت*", "s": {"لوزى": 10950.0}}, {"n": "سنتاوروس", "s": {"لوزى": 6750.0}}, {"n": "سند", "s": {"لوتس": 11350.0}}, {"n": "سنشوال  مسك", "s": {"لوزى": 5555.0}}, {"n": "سو سكاندل جان بول", "s": {"لوزى": 6450.0}}, {"n": "سوار دو باريس", "s": {"لوتس": 4950.0}}, {"n": "سوفاج", "s": {"لوزى": 5555.0, "لوتس": 3750.0}}, {"n": "سوفاج اليكسير", "s": {"لوتس": 3750.0}}, {"n": "سوفاج اليكسير  **", "s": {"لوتس": 4200.0}}, {"n": "سوفاج اليكسير-P", "s": {"لوتس": 6500.0}}, {"n": "سوفاج اودى برفيوم بريميم P", "s": {"لوتس": 5950.0}}, {"n": "سوفاج اوفورت", "s": {"لوزى": 5750.0}}, {"n": "سوفاج بريميم", "s": {"لوتس": 5150.0}}, {"n": "سوفاج ليكسير", "s": {"لوزى": 5750.0}}, {"n": "سوفاج*", "s": {"لوزى": 6350.0}}, {"n": "سولتيد كاراميل", "s": {"لوزى": 5950.0}}, {"n": "سويت كوفى", "s": {"لوزى": 7900.0}}, {"n": "سويت مورفين", "s": {"لوزى": 7650.0}}, {"n": "سى &سول شيروسا -سول دى جانيرو", "s": {"لوتس": 4350.0}}, {"n": "سى اتش M", "s": {"لوزى": 6850.0}}, {"n": "سى ارمانى", "s": {"لوتس": 3650.0}}, {"n": "سى ارمانى B", "s": {"لوزى": 5555.0}}, {"n": "سى ارمانى*", "s": {"لوزى": 6555.0}}, {"n": "سى باسيون", "s": {"لوتس": 4455.0}}, {"n": "سى باشون  E", "s": {"لوزى": 4050.0}}, {"n": "سى باشيون *", "s": {"لوزى": 6250.0}}, {"n": "سى فيورى", "s": {"لوزى": 5555.0}}, {"n": "سى كى وان رد", "s": {"لوزى": 5650.0}}, {"n": "سي اتش انيسجنيا", "s": {"لوزى": 10750.0}}, {"n": "سيتى اوف ستارز", "s": {"لوتس": 9775.0}}, {"n": "سيجار", "s": {"لوتس": 3795.0}}, {"n": "سيجار *", "s": {"لوزى": 6250.0}}, {"n": "سيلك بيتالز", "s": {"لوزى": 5950.0}}, {"n": "سيلك مسك", "s": {"لوزى": 5555.0}}, {"n": "سيمفونى", "s": {"لوتس": 22400.0}}, {"n": "سينما", "s": {"لوزى": 5950.0}}, {"n": "شامبيون", "s": {"لوتس": 4485.0}}, {"n": "شانديغار اكسبريس", "s": {"لوتس": 15300.0}}, {"n": "شانيل 5", "s": {"لوزى": 5555.0}}, {"n": "شروتى M", "s": {"لوزى": 4950.0}}, {"n": "شروتي", "s": {"لوتس": 3795.0}}, {"n": "شهره", "s": {"لوتس": 4250.0}}, {"n": "شيروسا40", "s": {"لوزى": 3850.0}}, {"n": "شيروسا59", "s": {"لوزى": 3850.0}}, {"n": "شيروسا62", "s": {"لوزى": 4350.0}}, {"n": "شيروسا68", "s": {"لوزى": 3850.0}}, {"n": "شيروسا71", "s": {"لوزى": 3850.0}}, {"n": "شيروسا76", "s": {"لوزى": 3850.0}}, {"n": "شيرى جلايز", "s": {"لوزى": 5950.0}}, {"n": "شيك شيخ", "s": {"لوزى": 7250.0}}, {"n": "شيك هريرا *", "s": {"لوزى": 7250.0}}, {"n": "صاروخ", "s": {"لوتس": 3950.0}}, {"n": "صحارى /بلجارى", "s": {"لوزى": 9750.0}}, {"n": "صن كيسد جاديس", "s": {"لوتس": 10250.0}}, {"n": "صندل مسك", "s": {"لوتس": 4555.0}}, {"n": "صندل وود", "s": {"لوزى": 10250.0}}, {"n": "صنسيت هيت*", "s": {"لوزى": 7950.0}}, {"n": "صنسيت هيت* W", "s": {"لوزى": 7590.0}}, {"n": "عطر الكعبه", "s": {"لوزى": 5250.0}}, {"n": "عطر خشب العود", "s": {"لوزى": 7250.0}}, {"n": "عمبر", "s": {"لوزى": 5555.0}}, {"n": "عمبر ابيض", "s": {"لوزى": 24000.0}}, {"n": "عمبر ايترنال", "s": {"لوزى": 11250.0}}, {"n": "عمبر سكاى", "s": {"لوزى": 10500.0}}, {"n": "عمبر عود", "s": {"لوزى": 10500.0}}, {"n": "عمبر وود", "s": {"لوتس": 7775.0}}, {"n": "عمرو دياب", "s": {"لوتس": 4500.0}}, {"n": "عود أصفهان", "s": {"لوتس": 5250.0}}, {"n": "عود ابياد", "s": {"لوزى": 6500.0}}, {"n": "عود ابيض**", "s": {"لوتس": 7250.0}}, {"n": "عود اصفهان", "s": {"لوزى": 9850.0}}, {"n": "عود الأمير", "s": {"لوتس": 3600.0}}, {"n": "عود الحرم", "s": {"لوزى": 6950.0}}, {"n": "عود الرمال", "s": {"لوتس": 4555.0}}, {"n": "عود الوسام", "s": {"لوتس": 4500.0}}, {"n": "عود اهواك", "s": {"لوتس": 13500.0}}, {"n": "عود ايلاند مونتال", "s": {"لوتس": 16675.0}}, {"n": "عود بوكيه", "s": {"لوزى": 6500.0, "لوتس": 4500.0}}, {"n": "عود تاتش مى", "s": {"لوتس": 4850.0}}, {"n": "عود دبى", "s": {"لوتس": 8650.0}}, {"n": "عود روز", "s": {"لوتس": 5750.0}}, {"n": "عود سافرون", "s": {"لوتس": 14500.0}}, {"n": "عود ستن مود", "s": {"لوزى": 14500.0}}, {"n": "عود سحاب", "s": {"لوزى": 23950.0}}, {"n": "عود عمانى", "s": {"لوتس": 4250.0}}, {"n": "عود فورجرنتيس", "s": {"لوتس": 5850.0}}, {"n": "عود كادنزا", "s": {"لوتس": 16500.0}}, {"n": "عود كرسنا", "s": {"لوزى": 11500.0}}, {"n": "عود كوين روزس", "s": {"لوزى": 7570.0}}, {"n": "عود ماراكوجا", "s": {"لوزى": 8950.0}}, {"n": "عود ملكى", "s": {"لوزى": 8750.0, "لوتس": 3950.0}}, {"n": "عود نوار", "s": {"لوتس": 5750.0}}, {"n": "عود& سبيس", "s": {"لوزى": 7750.0}}, {"n": "عود/فرانسيس كوركيدجان", "s": {"لوزى": 15150.0}}, {"n": "غرام", "s": {"لوزى": 5555.0}}, {"n": "فاديتك", "s": {"لوزى": 9550.0}}, {"n": "فالنتينو اومو بورن ان روما جرين", "s": {"لوتس": 4850.0}}, {"n": "فالنتينو بوروم", "s": {"لوزى": 6950.0}}, {"n": "فالنتينو دونا بورن ان روما جرين سترافاجانزا", "s": {"لوتس": 4850.0}}, {"n": "فام بارفيوم", "s": {"لوتس": 4555.0}}, {"n": "فانتزى", "s": {"لوزى": 5250.0}}, {"n": "فانتزي", "s": {"لوتس": 3750.0}}, {"n": "فانتزي بلوم", "s": {"لوتس": 3750.0}}, {"n": "فانتوم", "s": {"لوتس": 4500.0}}, {"n": "فانتوم /باكو ربان", "s": {"لوزى": 5555.0}}, {"n": "فانيل انتيك", "s": {"لوزى": 6850.0}}, {"n": "فانيل فاتال", "s": {"لوزى": 8850.0}}, {"n": "فانيلا رويال شوجرت باتشولى", "s": {"لوتس": 4890.0}}, {"n": "فانيلا فريك", "s": {"لوزى": 4250.0}}, {"n": "فانيلا لوف", "s": {"لوتس": 3550.0}}, {"n": "فانيلا6", "s": {"لوزى": 6850.0}}, {"n": "فانيليا", "s": {"لوزى": 3250.0}}, {"n": "فرارى اكستريم", "s": {"لوتس": 4180.0}}, {"n": "فرساتشى M", "s": {"لوزى": 6250.0}}, {"n": "فرست لاف", "s": {"لوزى": 5555.0}}, {"n": "فروسيه", "s": {"لوتس": 4850.0}}, {"n": "فل أندلسي", "s": {"لوزى": 6250.0}}, {"n": "فل اندلسى", "s": {"لوتس": 2750.0}}, {"n": "فلاور بومب", "s": {"لوزى": 4950.0}}, {"n": "فلاور بومب تايجر ليلى", "s": {"لوتس": 10950.0}}, {"n": "فلفيت انسنسو", "s": {"لوزى": 8950.0}}, {"n": "فلفيت روز", "s": {"لوزى": 5950.0}}, {"n": "فلورا باى جوتشى", "s": {"لوزى": 5555.0}}, {"n": "فلورا باي جوتشي", "s": {"لوتس": 3500.0}}, {"n": "فلورنس", "s": {"لوتس": 4250.0}}, {"n": "فلير دامور", "s": {"لوتس": 3950.0}}, {"n": "فلير ماجيستى", "s": {"لوتس": 4555.0}}, {"n": "فلير مسك", "s": {"لوزى": 6250.0}}, {"n": "فلير ناركوتك", "s": {"لوزى": 11500.0}}, {"n": "فليرناركوتك", "s": {"لوتس": 4950.0}}, {"n": "فهرنهيت", "s": {"لوزى": 5750.0, "لوتس": 3800.0}}, {"n": "فهرنهيت 32", "s": {"لوزى": 7500.0}}, {"n": "فواكه سعودى رقم (1)", "s": {"لوزى": 17750.0}}, {"n": "فواكه سعودي", "s": {"لوزى": 5350.0}}, {"n": "فودكا اون ذا روكس", "s": {"لوزى": 8950.0}}, {"n": "فوياج", "s": {"لوزى": 5150.0, "لوتس": 3800.0}}, {"n": "فوياج*", "s": {"لوتس": 4750.0}}, {"n": "فى اى بى 212 M", "s": {"لوزى": 5555.0}}, {"n": "فى اى بى 212 W", "s": {"لوزى": 5750.0}}, {"n": "فى اى بى رجالى", "s": {"لوتس": 4500.0}}, {"n": "فى اى بى روز212", "s": {"لوزى": 6150.0}}, {"n": "فير ملاكيت", "s": {"لوتس": 5950.0}}, {"n": "فيرزاتشى ايروس", "s": {"لوتس": 4500.0}}, {"n": "فيروز", "s": {"لوزى": 5850.0}}, {"n": "فيرى سكسي ناو", "s": {"لوزى": 5150.0}}, {"n": "فيفا لاجوسى سكر", "s": {"لوتس": 4555.0}}, {"n": "فيفث افنيو", "s": {"لوزى": 8350.0}}, {"n": "فيلفت تونكا", "s": {"لوزى": 5250.0}}, {"n": "فينيس / الجزيره", "s": {"لوزى": 9250.0}}, {"n": "فينيشيان برجاموت", "s": {"لوزى": 9995.0}}, {"n": "كارمينا / كريد", "s": {"لوزى": 7500.0}}, {"n": "كاريوكا كراش", "s": {"لوزى": 3850.0}}, {"n": "كاسيليا", "s": {"لوتس": 3750.0}}, {"n": "كاسيليا -A", "s": {"لوزى": 5995.0}}, {"n": "كاسيليا B", "s": {"لوزى": 4795.0}}, {"n": "كانت ستوب لوفينج يو", "s": {"لوزى": 9775.0}}, {"n": "كانديز ديلايت", "s": {"لوزى": 5950.0}}, {"n": "كرامب كوتيور", "s": {"لوتس": 5250.0}}, {"n": "كروم ازارو بيور", "s": {"لوتس": 4350.0}}, {"n": "كريد افنتوس", "s": {"لوزى": 10250.0}}, {"n": "كريد افينتوس - P", "s": {"لوتس": 7500.0}}, {"n": "كريزما", "s": {"لوزى": 5750.0, "لوتس": 4455.0}}, {"n": "كريزى لاف", "s": {"لوزى": 4850.0, "لوتس": 3950.0}}, {"n": "كريم كراميل", "s": {"لوزى": 3250.0}}, {"n": "كلمات", "s": {"لوزى": 10500.0, "لوتس": 5555.0}}, {"n": "كلمات**", "s": {"لوتس": 6500.0}}, {"n": "كلوى نرسيس A", "s": {"لوزى": 4950.0}}, {"n": "كنزو *", "s": {"لوزى": 8850.0}}, {"n": "كنزو -A", "s": {"لوزى": 6350.0}}, {"n": "كنزو اووم  انديجو 2025", "s": {"لوتس": 4850.0}}, {"n": "كنزو دى اتيه", "s": {"لوزى": 6350.0}}, {"n": "كنزو فلور", "s": {"لوزى": 5250.0}}, {"n": "كوبيا", "s": {"لوزى": 6350.0}}, {"n": "كوتون كاندي", "s": {"لوزى": 3250.0}}, {"n": "كورس سيلفر", "s": {"لوزى": 7150.0}}, {"n": "كوروم ازارو", "s": {"لوزى": 7995.0}}, {"n": "كوروم ليجند", "s": {"لوزى": 6250.0}}, {"n": "كوستا ازورو", "s": {"لوزى": 6250.0}}, {"n": "كوكو", "s": {"لوزى": 5995.0}}, {"n": "كوكو فانيل", "s": {"لوزى": 3600.0}}, {"n": "كوكو فانيلا", "s": {"لوتس": 3795.0}}, {"n": "كوكو نات باشون", "s": {"لوتس": 3795.0}}, {"n": "كول وتر W", "s": {"لوزى": 5995.0}}, {"n": "كوينز", "s": {"لوزى": 5995.0}}, {"n": "كى", "s": {"لوتس": 5150.0}}, {"n": "كيالى - بيستاشيو جيلاتو", "s": {"لوزى": 3550.0}}, {"n": "كيالى - جوسى ابل 01", "s": {"لوزى": 4750.0}}, {"n": "كيالى - فانيلا28", "s": {"لوزى": 4450.0}}, {"n": "كيالى - يوم بوجى مارشيمللو 81", "s": {"لوزى": 4600.0}}, {"n": "كيالى 37 | سويت بنانا", "s": {"لوزى": 4600.0}}, {"n": "كيالى 39 | ايدن سباركلنج ليتشي*", "s": {"لوزى": 4600.0}}, {"n": "كيالى 42 -فانيلا كاندى شوجر", "s": {"لوزى": 4600.0}}, {"n": "كير نوار", "s": {"لوزى": 7500.0}}, {"n": "كيركى", "s": {"لوزى": 9150.0}}, {"n": "كيلفين كلاين", "s": {"لوزى": 4950.0}}, {"n": "كيلينج مى سلولى", "s": {"لوزى": 11250.0}}, {"n": "كينج", "s": {"لوزى": 6850.0}}, {"n": "لا بيل", "s": {"لوزى": 5750.0}}, {"n": "لا توليب", "s": {"لوتس": 10250.0}}, {"n": "لابيدوس", "s": {"لوتس": 3600.0}}, {"n": "لابيدوس *", "s": {"لوزى": 8500.0}}, {"n": "لابيدوس-B", "s": {"لوزى": 4250.0}}, {"n": "لاف اذ هيفنلى", "s": {"لوتس": 4555.0}}, {"n": "لاف اذ هيفنلي", "s": {"لوزى": 5200.0}}, {"n": "لاف تيبروز", "s": {"لوزى": 10250.0}}, {"n": "لافندر", "s": {"لوزى": 2990.0}}, {"n": "لافى اي بيل", "s": {"لوزى": 6500.0}}, {"n": "لافى بيل انتنس", "s": {"لوزى": 4570.0}}, {"n": "لافى بيل*", "s": {"لوتس": 4150.0}}, {"n": "لاكوست اسنتشال -B", "s": {"لوزى": 5300.0}}, {"n": "لاكوست اسنتشال*", "s": {"لوزى": 6300.0}}, {"n": "لاكوست اسنشال", "s": {"لوتس": 4450.0}}, {"n": "لاكوست بلاك", "s": {"لوتس": 3850.0}}, {"n": "لاكوست بلو 12", "s": {"لوزى": 5990.0}}, {"n": "لاكوست تشالنج", "s": {"لوزى": 6995.0}}, {"n": "لاكوست رووج", "s": {"لوزى": 5700.0}}, {"n": "لاكوست نوار", "s": {"لوزى": 6500.0}}, {"n": "لاكوست وايت", "s": {"لوزى": 5150.0, "لوتس": 3850.0}}, {"n": "لانوى دو لو اوم", "s": {"لوزى": 5150.0}}, {"n": "لانوي ايسيمياكي", "s": {"لوتس": 4450.0}}, {"n": "لايت بلو W", "s": {"لوزى": 6150.0}}, {"n": "لايت بلو فور ايفر", "s": {"لوزى": 5750.0}}, {"n": "لايتون", "s": {"لوزى": 8500.0}}, {"n": "لايف فندى M", "s": {"لوزى": 6885.0}}, {"n": "لمبرتريس", "s": {"لوزى": 6650.0}}, {"n": "لنتردي روج", "s": {"لوزى": 4950.0}}, {"n": "لنترديت/جيفنشى", "s": {"لوزى": 6095.0}}, {"n": "لو بو - P", "s": {"لوتس": 6500.0}}, {"n": "لو بو بارادايس جاردن", "s": {"لوزى": 4150.0}}, {"n": "لو بو لوبرفيوم", "s": {"لوزى": 6500.0}}, {"n": "لو مال أون بورد", "s": {"لوتس": 3850.0}}, {"n": "لو مال اليكسير", "s": {"لوتس": 4550.0}}, {"n": "لو مال لو برفيوم", "s": {"لوزى": 3500.0}}, {"n": "لو مينستى", "s": {"لوتس": 33350.0}}, {"n": "لو هووم الا روز", "s": {"لوزى": 7850.0}}, {"n": "لو هووم ايديال اكستريم", "s": {"لوزى": 8750.0}}, {"n": "لوست شيرى", "s": {"لوزى": 6995.0}}, {"n": "لوفيست بيرنينج شيرى48-كيالى", "s": {"لوتس": 4555.0}}, {"n": "لولى بوب", "s": {"لوزى": 3250.0}}, {"n": "لوليتا", "s": {"لوزى": 4750.0}}, {"n": "ليالي الشوق", "s": {"لوتس": 4455.0}}, {"n": "ليبر", "s": {"لوزى": 6500.0, "لوتس": 4555.0}}, {"n": "ليتشى كريسب", "s": {"لوزى": 5950.0}}, {"n": "ليجند سبريت", "s": {"لوتس": 4250.0}}, {"n": "ليدى بنك", "s": {"لوزى": 5500.0}}, {"n": "ليدى مليون", "s": {"لوزى": 5555.0}}, {"n": "ليدى مليون امبير", "s": {"لوتس": 4555.0}}, {"n": "ليدى مون بلو", "s": {"لوزى": 6500.0}}, {"n": "ليلتى", "s": {"لوزى": 15150.0}}, {"n": "ماتير نوار", "s": {"لوتس": 9775.0}}, {"n": "ماد هونى", "s": {"لوتس": 17250.0}}, {"n": "مارشميلو كلاود", "s": {"لوزى": 5950.0}}, {"n": "مارى مى", "s": {"لوزى": 6850.0}}, {"n": "مافرو", "s": {"لوزى": 4500.0}}, {"n": "ماليزيا", "s": {"لوزى": 5990.0}}, {"n": "مان بلو مرسيدس", "s": {"لوتس": 3795.0}}, {"n": "مان بلو مرسيدس-P", "s": {"لوتس": 6500.0}}, {"n": "ماى سيلف", "s": {"لوتس": 4500.0}}, {"n": "ماى واى", "s": {"لوزى": 5750.0}}, {"n": "مثبت", "s": {"لوزى": 6950.0}}, {"n": "مخلط الجزيره", "s": {"لوزى": 10750.0}}, {"n": "مخلط الحجاز", "s": {"لوزى": 7775.0}}, {"n": "مخلط الحرم", "s": {"لوزى": 7775.0}}, {"n": "مخلط ذهبى", "s": {"لوزى": 6850.0}}, {"n": "مخلط سيوفى", "s": {"لوزى": 5120.0}}, {"n": "مخلط كشخة", "s": {"لوزى": 7995.0}}, {"n": "مخلط كشميرى", "s": {"لوزى": 6200.0}}, {"n": "مخلط معمول", "s": {"لوزى": 11500.0}}, {"n": "مخلط ورد", "s": {"لوزى": 7280.0}}, {"n": "مدموذيل كوكو", "s": {"لوتس": 3450.0}}, {"n": "مدموذيل كوكو  E", "s": {"لوزى": 4350.0}}, {"n": "مدموزيل كوكو *", "s": {"لوزى": 5770.0}}, {"n": "مزيل رائحه الكحول", "s": {"لوزى": 4570.0}}, {"n": "مس شيرى", "s": {"لوزى": 6500.0}}, {"n": "مستر بربرى", "s": {"لوتس": 4500.0}}, {"n": "مستر سام", "s": {"لوزى": 6975.0}}, {"n": "مسك ابيض", "s": {"لوزى": 3100.0, "لوتس": 2750.0}}, {"n": "مسك اصفر", "s": {"لوزى": 3400.0}}, {"n": "مسك التوت", "s": {"لوزى": 5750.0}}, {"n": "مسك الرمان", "s": {"لوزى": 5750.0}}, {"n": "مسك السلطان", "s": {"لوزى": 10500.0}}, {"n": "مسك الشيكولاتة", "s": {"لوزى": 5750.0}}, {"n": "مسك الطهاره", "s": {"لوزى": 6250.0}}, {"n": "مسك العود", "s": {"لوزى": 5750.0}}, {"n": "مسك الفانيلا", "s": {"لوزى": 5750.0}}, {"n": "مسك الكعبه", "s": {"لوتس": 6500.0}}, {"n": "مسك انجليزى", "s": {"لوزى": 8950.0}}, {"n": "مسك انجليزى-A", "s": {"لوزى": 4950.0}}, {"n": "مسك انجليزي", "s": {"لوتس": 3500.0}}, {"n": "مسك بودر", "s": {"لوزى": 5750.0}}, {"n": "مسك ثيرابى", "s": {"لوتس": 14500.0}}, {"n": "مسك دمشق", "s": {"لوزى": 9500.0}}, {"n": "مسك غزال اسود", "s": {"لوزى": 15500.0}}, {"n": "مسك للجسم **", "s": {"لوزى": 8500.0}}, {"n": "مسك متسلق", "s": {"لوتس": 4575.0}}, {"n": "مسك متسلق سعودى", "s": {"لوزى": 4750.0, "لوتس": 4350.0}}, {"n": "مسك متسلق ملكي", "s": {"لوزى": 8500.0}}, {"n": "مضاوى", "s": {"لوتس": 7650.0}}, {"n": "مليون جولد", "s": {"لوزى": 3850.0}}, {"n": "مورتال سكين", "s": {"لوزى": 11000.0}}, {"n": "موليكول1", "s": {"لوزى": 5555.0}}, {"n": "موليكول2", "s": {"لوزى": 7950.0}}, {"n": "موليكيول 4", "s": {"لوزى": 11250.0}}, {"n": "مون بلو ليجند E", "s": {"لوزى": 4500.0}}, {"n": "مون بلو ليجند*", "s": {"لوزى": 7500.0, "لوتس": 4500.0}}, {"n": "مون جيرلان فلورال", "s": {"لوتس": 4455.0}}, {"n": "مون سباركل", "s": {"لوزى": 4500.0, "لوتس": 3790.0}}, {"n": "مونت بلانك اكسبلورر", "s": {"لوتس": 4300.0}}, {"n": "مونتانا *", "s": {"لوزى": 7500.0}}, {"n": "ميار شيرى انتنس", "s": {"لوتس": 4555.0}}, {"n": "ميجامار", "s": {"لوتس": 39500.0}}, {"n": "ميجامار-P", "s": {"لوتس": 20475.0}}, {"n": "ميد نايت جولييت", "s": {"لوتس": 4555.0}}, {"n": "ميد نايت سلفر", "s": {"لوزى": 5800.0}}, {"n": "ميد نايت فانتازيا", "s": {"لوزى": 4500.0}}, {"n": "ميد نايت فانتزي", "s": {"لوتس": 3500.0}}, {"n": "ميس بيوتى", "s": {"لوزى": 6200.0}}, {"n": "ميس ديور روز &روز", "s": {"لوتس": 4555.0}}, {"n": "ميلك شيك", "s": {"لوزى": 3150.0}}, {"n": "نارسيسو", "s": {"لوتس": 4555.0}}, {"n": "نارسيسو بودرى", "s": {"لوزى": 6500.0}}, {"n": "نارسيسو روج", "s": {"لوزى": 6300.0}}, {"n": "نايت فال باتشولى", "s": {"لوزى": 8950.0}}, {"n": "نايت فلايت*", "s": {"لوزى": 6750.0}}, {"n": "نوار / الماجد للعطور", "s": {"لوزى": 8750.0}}, {"n": "نور / سو عود", "s": {"لوزى": 10500.0}}, {"n": "نوفو موند", "s": {"لوتس": 9775.0}}, {"n": "نيشان .", "s": {"لوزى": 6950.0}}, {"n": "نيكسوس 1861", "s": {"لوزى": 11500.0}}, {"n": "نيو اكوا دى جيو M", "s": {"لوزى": 6750.0}}, {"n": "نيو بوص B-", "s": {"لوزى": 7150.0}}, {"n": "نيو بوص*", "s": {"لوزى": 8750.0}}, {"n": "نيو شامبيون", "s": {"لوزى": 5750.0}}, {"n": "نيو ماربرت مان", "s": {"لوزى": 6750.0}}, {"n": "نيو هوجو*", "s": {"لوزى": 6995.0}}, {"n": "نيو وان مان شو*", "s": {"لوزى": 6200.0}}, {"n": "نيولوك2024", "s": {"لوتس": 22400.0}}, {"n": "نيويورك عمبر", "s": {"لوزى": 10250.0}}, {"n": "نيويورك عود", "s": {"لوزى": 8500.0}}, {"n": "هابت روج اكستريم", "s": {"لوتس": 17850.0}}, {"n": "هابى كلينيك M", "s": {"لوزى": 8600.0}}, {"n": "هاج سنت", "s": {"لوتس": 4550.0}}, {"n": "هارمونيك عود", "s": {"لوزى": 6750.0}}, {"n": "هافوك", "s": {"لوتس": 4950.0}}, {"n": "هالتان", "s": {"لوتس": 14500.0}}, {"n": "هالوين", "s": {"لوزى": 6050.0}}, {"n": "هاواى", "s": {"لوزى": 6950.0}}, {"n": "هبونتيك بويزون", "s": {"لوزى": 8855.0}}, {"n": "هدسون فالى", "s": {"لوتس": 17250.0}}, {"n": "هريرا 212 سكسى -A", "s": {"لوزى": 6250.0}}, {"n": "هريرا 212 سكسى W", "s": {"لوزى": 5555.0}}, {"n": "هريرا 212 سكسى*", "s": {"لوزى": 9250.0}}, {"n": "هريرا 212-B", "s": {"لوزى": 6750.0}}, {"n": "هريرا212 W", "s": {"لوزى": 6500.0}}, {"n": "همسات", "s": {"لوزى": 6850.0}}, {"n": "هوت كوتيور", "s": {"لوزى": 6850.0}}, {"n": "هوجو XX", "s": {"لوزى": 7850.0}}, {"n": "هوجو XY", "s": {"لوزى": 6995.0}}, {"n": "هوجو المنتس", "s": {"لوزى": 6995.0}}, {"n": "هوجو انرجيز *", "s": {"لوزى": 6995.0}}, {"n": "هوجو بوص *", "s": {"لوزى": 6750.0}}, {"n": "هوجو بوص W", "s": {"لوزى": 5250.0}}, {"n": "هوجو جينز", "s": {"لوتس": 4550.0}}, {"n": "هوجو ريد", "s": {"لوزى": 6250.0}}, {"n": "هيبيسكيس", "s": {"لوتس": 18500.0}}, {"n": "هيرميسنس عود اليزان", "s": {"لوتس": 20750.0}}, {"n": "هيرود", "s": {"لوزى": 9500.0}}, {"n": "وان &اونلى", "s": {"لوزى": 7995.0}}, {"n": "وان مان شو", "s": {"لوتس": 3750.0}}, {"n": "وان مان شو *", "s": {"لوزى": 6250.0}}, {"n": "وان مليون", "s": {"لوتس": 3950.0}}, {"n": "وان مليون - P", "s": {"لوتس": 6500.0}}, {"n": "وان مليون رويال", "s": {"لوتس": 4550.0}}, {"n": "واى", "s": {"لوزى": 6250.0}}, {"n": "واى اودى برفيوم", "s": {"لوتس": 4550.0}}, {"n": "وايلد شيري", "s": {"لوتس": 4250.0}}, {"n": "ورد اسطنبولى", "s": {"لوتس": 10950.0}}, {"n": "ورد السرتى", "s": {"لوزى": 6500.0}}, {"n": "ورد الطائف", "s": {"لوزى": 12000.0}}, {"n": "ورد بلدى", "s": {"لوزى": 2950.0}}, {"n": "وصال", "s": {"لوزى": 6550.0, "لوتس": 4750.0}}, {"n": "وومو فالنتينو", "s": {"لوزى": 7590.0}}, {"n": "ويك اند-A", "s": {"لوزى": 4500.0}}, {"n": "وينتر كاندى ابل", "s": {"لوزى": 4750.0}}, {"n": "يارا", "s": {"لوزى": 3500.0}}, {"n": "يارا اليكسير", "s": {"لوزى": 4250.0}}, {"n": "يارا كاندى", "s": {"لوزى": 3500.0}}, {"n": "يارا لطافة 2021", "s": {"لوتس": 4250.0}}, {"n": "ياس اى ام", "s": {"لوتس": 4555.0}}, {"n": "ياس اى ام بنك فرست", "s": {"لوتس": 4555.0}}, {"n": "ياسمين", "s": {"لوزى": 3500.0, "لوتس": 2600.0}}, {"n": "يام يام ارماف", "s": {"لوتس": 4500.0}}, {"n": "يوم بستاشيو جيلاتو 33", "s": {"لوتس": 4555.0}}, {"n": "كريستال نوار", "s": {"لوزى": 6220.0}}, {"n": "برادا بارادايم", "s": {"لوتس": 3950.0}}, {"n": "لا بومبا كارولينا هريرا", "s": {"لوتس": 4940.0}}, {"n": "فالنتينو اومو بورن ان روما جرين لوتس", "s": {"لوتس": 4850.0}}, {"n": "فالنتينو دونا بورن ان روما جرين سترا فاجانزا لوتس", "s": {"لوتس": 4850.0}}, {"n": "ايماجينيشن*", "s": {"لوتس": 33000.0}}, {"n": "فانيلا باودر", "s": {"لوتس": 7500.0}}];
+const TIERS = {
+  "لوزى":[[0.1,.02],[1,.03],[3,.04],[5,.05],[10,.06],[20,.07],[25,.08]],
+  "لوتس":[[0.1,.07],[0.5,.09],[1,.12],[5,.15],[10,.17],[20,.18]]
+};
+
+let rowId=0,rows=[],activeModalRid=null,activeDeskRid=null,deskTimer;
+let discMode='auto';
+
+const now=new Date();
+document.getElementById('print-date').textContent=now.toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+document.getElementById('print-num').textContent='عرض سعر #'+String(now.getTime()).slice(-4);
+
+function isMobile(){return window.innerWidth<768;}
+
+/* ── CUSTOMER ── */
+function updatePrintCustomer(){
+  const name=document.getElementById('customer-name').value.trim();
+  document.getElementById('print-customer-name').textContent=name||'—';
+  document.getElementById('print-customer-block').style.display='flex';
+}
+
+/* ── DISCOUNT MODE ── */
+function setMode(mode){
+  discMode=mode;
+  ['auto','none','manual'].forEach(m=>document.getElementById('t-'+m).classList.toggle('active',m===mode));
+  document.getElementById('manual-cells').classList.toggle('visible',mode==='manual');
+  document.getElementById('tiers-card').classList.toggle('dimmed',mode!=='auto');
+  if(mode==='manual') setTimeout(()=>document.getElementById('disc-luzi').focus(),100);
+  updateSummary();
+}
+
+function getDiscount(src,qty){
+  if(discMode==='none') return 0;
+  if(discMode==='manual'){
+    const id=src==='لوزى'?'disc-luzi':'disc-lotus';
+    return Math.min(parseFloat(document.getElementById(id)?.value)||0,100)/100;
+  }
+  const t=TIERS[src];if(!t) return 0;
+  let d=0;for(const [th,pct] of t){if(qty>=th)d=pct;else break;}return d;
+}
+
+function buildDiscPills(bySrc){
+  const pills=document.getElementById('print-disc-pills');
+  pills.innerHTML='';
+  if(discMode==='none'){
+    pills.innerHTML='<span class="print-disc-pill none">بدون خصم</span>';
+    return;
+  }
+  Object.keys(bySrc).forEach(src=>{
+    const disc=getDiscount(src,bySrc[src].qty);
+    const cls=discMode==='manual'?'manual':'';
+    const label=disc===0?'0%':fmtPct(disc);
+    pills.innerHTML+=`<span class="print-disc-pill ${cls}">${src}: ${label}</span>`;
+  });
+  document.getElementById('print-customer-block').style.display='flex';
+}
+
+function fmt(n,dec=0){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:dec,maximumFractionDigits:dec});}
+function fmtPct(n){return(n*100).toFixed(1).replace(/\.0$/,'')+'%';}
+
+/* ── ROWS ── */
+function addRow(){
+  const id=++rowId;
+  rows.push({id,name:'',source:'',price:0,qty:1});
+  renderAll();
+  setTimeout(()=>{if(isMobile())openModal(id);else{const el=document.querySelector(`[data-drid="${id}"] .desktop-input`);if(el)el.focus();}},80);
+}
+function removeRow(id){rows.splice(rows.findIndex(r=>r.id===id),1);renderAll();updateSummary();}
+function clearAll(){if(rows.length&&!confirm('مسح جميع الأصناف؟'))return;rows=[];renderAll();updateSummary();}
+
+/* ── MODAL ── */
+function openModal(rid){
+  activeModalRid=rid;
+  const inp=document.getElementById('searchModalInput');
+  inp.value='';filterModal('');
+  document.getElementById('searchOverlay').classList.add('active');
+  setTimeout(()=>inp.focus(),150);
+}
+function closeModal(){document.getElementById('searchOverlay').classList.remove('active');activeModalRid=null;}
+function filterModal(val){
+  const res=document.getElementById('searchResults');
+  const m=val?CATALOG.filter(c=>c.n.includes(val)).slice(0,100):CATALOG.slice(0,80);
+  res.innerHTML=m.length
+    ?m.map(x=>`<div class="sug-item" onclick="selectMobile('${x.n.replace(/'/g,"\\'")}')" ><span class="sug-name">${x.n}</span><span class="sug-src">${Object.keys(x.s).join(' • ')}</span></div>`).join('')
+    :'<div class="sug-empty">لا توجد نتائج</div>';
+}
+function selectMobile(name){
+  if(activeModalRid===null)return;
+  const row=rows.find(r=>r.id===activeModalRid);if(!row)return;
+  const item=CATALOG.find(c=>c.n===name);if(!item)return;
+  row.name=name;const srcs=Object.keys(item.s);
+  row.source=srcs[0];row.price=item.s[row.source];
+  closeModal();renderAll();updateSummary();
+}
+
+/* ── DESKTOP SEARCH ── */
+function deskInput(rid,val){
+  const row=rows.find(r=>r.id===rid);if(!row)return;
+  row.name=val;clearTimeout(deskTimer);
+  deskTimer=setTimeout(()=>showDeskSug(rid,val),80);
+}
+function showDeskSug(rid,val){
+  closeAllDeskSug();
+  const box=document.getElementById('dsug-'+rid);if(!box)return;
+  const inp=document.querySelector(`[data-drid="${rid}"] .desktop-input`);if(!inp)return;
+  if(!val){box.style.display='none';return;}
+  const m=CATALOG.filter(c=>c.n.includes(val)).slice(0,80);
+  if(!m.length){box.style.display='none';return;}
+  box.innerHTML=m.map(x=>`<div class="sug-item" onmousedown="selectDesk(${rid},'${x.n.replace(/'/g,"\\'")}')"><span>${x.n}</span><span class="sug-src">${Object.keys(x.s).join(' • ')}</span></div>`).join('');
+  const r=inp.getBoundingClientRect();
+  box.style.top=(r.bottom+window.scrollY+4)+'px';
+  box.style.right=(window.innerWidth-r.right)+'px';
+  box.style.width=Math.max(r.width,300)+'px';
+  box.style.left='auto';box.style.display='block';activeDeskRid=rid;
+}
+function closeAllDeskSug(){document.querySelectorAll('.desktop-sug').forEach(b=>b.style.display='none');activeDeskRid=null;}
+function selectDesk(rid,name){
+  const row=rows.find(r=>r.id===rid);if(!row)return;
+  const item=CATALOG.find(c=>c.n===name);if(!item)return;
+  row.name=name;const srcs=Object.keys(item.s);
+  row.source=srcs[0];row.price=item.s[row.source];
+  closeAllDeskSug();renderAll();updateSummary();
+}
+function hideDeskSug(rid){setTimeout(()=>{const b=document.getElementById('dsug-'+rid);if(b)b.style.display='none';},200);}
+function changeSource(rid,src){
+  const row=rows.find(r=>r.id===rid);if(!row)return;
+  const item=CATALOG.find(c=>c.n===row.name);if(!item)return;
+  row.source=src;row.price=item.s[src]||0;renderAll();updateSummary();
+}
+function changeQty(rid,val){
+  const row=rows.find(r=>r.id===rid);if(!row)return;
+  row.qty=parseFloat(val)||0;
+  const tot=document.getElementById('tot-'+rid);if(tot)tot.textContent=fmt(row.qty*row.price)+' جنيه';
+  const dtot=document.querySelector(`[data-drid="${rid}"] .row-total`);if(dtot)dtot.textContent=fmt(row.qty*row.price);
+  updateSummary();
+}
+
+/* ── RENDER ── */
+function renderAll(){renderMobile();renderDesktop();}
+function renderMobile(){
+  const container=document.getElementById('inv-cards');
+  container.querySelectorAll('.inv-card').forEach(c=>c.remove());
+  const empty=document.getElementById('empty-mob');
+  if(!rows.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  rows.forEach((r,i)=>{
+    const item=CATALOG.find(c=>c.n===r.name);
+    const srcs=item?Object.keys(item.s):[];
+    const srcEl=srcs.length>1
+      ?`<select class="src-select" onchange="changeSource(${r.id},this.value)">${srcs.map(s=>`<option value="${s}" ${s===r.source?'selected':''}>${s}</option>`).join('')}</select>`
+      :(r.source?`<span class="src-badge ${r.source==='لوزى'?'src-luzi':'src-lotus'}">${r.source}</span>`:'—');
+    const card=document.createElement('div');
+    card.className='inv-card';
+    card.innerHTML=`
+      <div class="inv-card-header">
+        <div class="inv-num">${i+1}</div>
+        <div style="flex:1;"><div class="item-input${r.name?' filled':''}" onclick="openModal(${r.id})">${r.name||'اضغط للبحث عن صنف...'}</div></div>
+        <button class="btn btn-del" onclick="removeRow(${r.id})">✕</button>
+      </div>
+      <div class="inv-card-body">
+        <div><div class="field-label">المصدر</div>${srcEl}</div>
+        <div><div class="field-label">السعر</div><div class="price-disp">${r.price?fmt(r.price):'—'}</div></div>
+        <div><div class="field-label">الكمية (كجم)</div>
+          <input class="qty-input" type="number" step="0.1" min="0.1" value="${r.qty}" inputmode="decimal" oninput="changeQty(${r.id},this.value)">
+        </div>
+      </div>
+      <div class="inv-total-row">
+        <span class="total-label">إجمالى الصنف</span>
+        <span class="total-value" id="tot-${r.id}">${fmt(r.qty*r.price)} جنيه</span>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+function renderDesktop(){
+  const tbody=document.getElementById('inv-body');
+  const emptyDesk=document.getElementById('empty-desk');
+  document.querySelectorAll('.desktop-sug').forEach(b=>b.remove());
+  if(!rows.length){tbody.innerHTML='';emptyDesk.style.display='block';return;}
+  emptyDesk.style.display='none';
+  tbody.innerHTML=rows.map((r,i)=>{
+    const item=CATALOG.find(c=>c.n===r.name);
+    const srcs=item?Object.keys(item.s):[];
+    const srcOpts=srcs.map(s=>`<option value="${s}" ${s===r.source?'selected':''}>${s}</option>`).join('');
+    const srcEl=srcs.length>1
+      ?`<select class="desktop-src" onchange="changeSource(${r.id},this.value)">${srcOpts}</select>`
+      :(r.source?`<span class="src-badge ${r.source==='لوزى'?'src-luzi':'src-lotus'}">${r.source}</span>`:'—');
+    return `<tr data-drid="${r.id}">
+      <td class="row-num-cell">${i+1}</td>
+      <td class="col-name"><div class="desktop-picker">
+        <input class="desktop-input${r.name?' filled':''}" type="text" value="${r.name||''}" placeholder="ابحث بالاسم..."
+          oninput="deskInput(${r.id},this.value)" onfocus="showDeskSug(${r.id},this.value)" onblur="hideDeskSug(${r.id})">
+      </div></td>
+      <td class="col-src">${srcEl}</td>
+      <td class="col-price"><div class="desktop-price">${r.price?fmt(r.price):''}</div></td>
+      <td class="col-qty"><input class="desktop-qty" type="number" step="0.1" min="0.1" value="${r.qty}" oninput="changeQty(${r.id},this.value)"></td>
+      <td class="col-total row-total">${fmt(r.qty*r.price)}</td>
+      <td class="col-act"><button class="btn btn-del" onclick="removeRow(${r.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+  rows.forEach(r=>{
+    const box=document.createElement('div');box.id='dsug-'+r.id;box.className='desktop-sug';
+    document.body.appendChild(box);
+  });
+}
+
+/* ── SUMMARY ── */
+function updateSummary(){
+  const bySrc={};
+  for(const r of rows){
+    if(!r.source||!r.price)continue;
+    if(!bySrc[r.source])bySrc[r.source]={qty:0,amt:0};
+    bySrc[r.source].qty+=r.qty||0;
+    bySrc[r.source].amt+=(r.qty||0)*(r.price||0);
+  }
+  const srcs=Object.keys(bySrc);
+  let totAmt=0,totFinal=0,totQty=0;
+  const badgeClass=discMode==='manual'?'manual-badge':'disc-badge';
+
+  document.getElementById('sum-body').innerHTML=srcs.map(s=>{
+    const d=bySrc[s],disc=getDiscount(s,d.qty),final=d.amt*(1-disc);
+    totAmt+=d.amt;totFinal+=final;totQty+=d.qty;
+    const discLabel=disc===0?'—':`<span class="${badgeClass}">${fmtPct(disc)}</span>`;
+    return `<tr>
+      <td><span class="src-badge ${s==='لوزى'?'src-luzi':'src-lotus'}">${s}</span></td>
+      <td>${fmt(d.qty,2)} كجم</td><td>${fmt(d.amt)} جنيه</td>
+      <td>${discLabel}</td><td><b>${fmt(final)} جنيه</b></td>
+    </tr>`;
+  }).join('');
+
+  const mobSum=document.getElementById('mob-sum-cards');
+  mobSum.innerHTML=srcs.map(s=>{
+    const d=bySrc[s],disc=getDiscount(s,d.qty),final=d.amt*(1-disc);
+    return `<div class="summary-card">
+      <div class="summary-title"><span class="src-badge ${s==='لوزى'?'src-luzi':'src-lotus'}" style="margin-left:8px;">${s}</span>ملخص المصدر</div>
+      <div class="sum-row"><span class="sum-row-label">إجمالى الكمية</span><span class="sum-row-val">${fmt(d.qty,2)} كجم</span></div>
+      <div class="sum-row"><span class="sum-row-label">إجمالى المبلغ</span><span class="sum-row-val">${fmt(d.amt)} جنيه</span></div>
+      <div class="sum-row"><span class="sum-row-label">نسبة الخصم</span><span class="sum-row-val"><span class="${badgeClass}">${disc===0?'—':fmtPct(disc)}</span></span></div>
+      <div class="sum-row" style="background:#f0fdf4;">
+        <span class="sum-row-label" style="color:#166534;font-weight:700;">بعد الخصم</span>
+        <span class="sum-row-val" style="color:#166534;font-size:16px;">${fmt(final)} جنيه</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const saved=totAmt-totFinal;
+  document.getElementById('f-qty').textContent=fmt(totQty,2)+' كجم';
+  document.getElementById('f-amt').textContent=fmt(totAmt)+' جنيه';
+  document.getElementById('f-saved').textContent=fmt(saved)+' جنيه';
+  document.getElementById('f-final').textContent=fmt(totFinal)+' جنيه';
+  document.getElementById('grand-amount').textContent=fmt(totFinal);
+  document.getElementById('grand-saved2').textContent=fmt(saved)+' جنيه';
+  document.getElementById('h-items').textContent=rows.length;
+  document.getElementById('h-total').textContent=fmt(totFinal);
+  document.getElementById('summary').style.display=rows.length?'block':'none';
+
+  // update print discount pills
+  buildDiscPills(bySrc);
+}
+
+/* ── EVENTS ── */
+document.getElementById('searchOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.addEventListener('click',e=>{if(!e.target.closest('.desktop-picker'))closeAllDeskSug();});
+window.addEventListener('scroll',()=>{
+  if(activeDeskRid!=null){
+    const inp=document.querySelector(`[data-drid="${activeDeskRid}"] .desktop-input`);
+    if(inp)showDeskSug(activeDeskRid,inp.value);
+  }
+},true);
+
+/* ── FILENAME HELPER ── */
+function buildFilename(){
+  const customer = document.getElementById('customer-name').value.trim();
+  const serial   = document.getElementById('print-num').textContent.trim();
+  const parts = [];
+  if(customer) parts.push(customer);
+  parts.push(serial);
+  return parts.join(' - ');
+}
+
+function updateFilenameHint(){
+  const filename = buildFilename();
+  const hint = document.getElementById('filename-hint');
+  const txt  = document.getElementById('filename-text');
+  if(filename){ txt.textContent = filename; hint.style.display = 'flex'; }
+  else { hint.style.display = 'none'; }
+}
+
+function copyFilename(){
+  const filename = buildFilename();
+  if(!filename) return;
+  const txt = document.getElementById('filename-text');
+  const old = txt.textContent;
+  const showCopied = () => { txt.textContent = '✅ تم النسخ!'; setTimeout(()=>{ txt.textContent = old; }, 1800); };
+  navigator.clipboard.writeText(filename).then(showCopied).catch(()=>{
+    const el = document.createElement('textarea');
+    el.value = filename; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    showCopied();
+  });
+}
+
+/* ── PRINT WITH FILENAME ── */
+function printWithName(){
+  const filename = buildFilename();
+  const titleEl  = document.querySelector('title');
+  const oldTitle = document.title;
+  if(filename){ document.title = filename; if(titleEl) titleEl.textContent = filename; }
+  window.print();
+  setTimeout(()=>{ document.title = 'عرض سعر - مجموعة طيبة للعطور'; if(titleEl) titleEl.textContent = 'عرض سعر - مجموعة طيبة للعطور'; }, 3000);
+}
+
+addRow(); updateFilenameHint();
+</script>
+</body>
+</html>
