@@ -741,18 +741,3 @@ function copyFilename(){
     showCopied();
   });
 }
-
-/* ── PRINT WITH FILENAME ── */
-function printWithName(){
-  const filename = buildFilename();
-  const titleEl  = document.querySelector('title');
-  const oldTitle = document.title;
-  if(filename){ document.title = filename; if(titleEl) titleEl.textContent = filename; }
-  window.print();
-  setTimeout(()=>{ document.title = 'عرض سعر - مجموعة طيبة للعطور'; if(titleEl) titleEl.textContent = 'عرض سعر - مجموعة طيبة للعطور'; }, 3000);
-}
-
-addRow(); updateFilenameHint();
-</script>
-</body>
-</html>
