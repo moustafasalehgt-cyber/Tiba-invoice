@@ -175,7 +175,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
 .dinp{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;background:#f8faff;outline:none;}
 .dinp:focus{border-color:var(--blue);background:#fff;}
 .dinp.filled{background:#fff;border-color:#86b3d6;}
-.dsug{position:fixed;background:#fff;border:1.5px solid var(--border);border-radius:9px;max-height:250px;overflow-y:auto;z-index:999999;box-shadow:0 8px 32px rgba(10,22,40,.22);display:none;min-width:260px;}
+.dsug{display:none;position:fixed;z-index:2147483647;scroll-behavior:auto;}
+.dsug::-webkit-scrollbar{width:7px;}
+.dsug::-webkit-scrollbar-track{background:#f1f5f9;}
+.dsug::-webkit-scrollbar-thumb{background:#1a3a6e;border-radius:4px;cursor:pointer;}
+.dsug::-webkit-scrollbar-thumb:hover{background:#c8a95b;}
 .dsug .si{font-size:12px;padding:8px 12px;}
 .dsug .si:hover{background:#eff6ff;cursor:pointer;}
 .dprc{padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-weight:600;color:var(--blue);background:#f0f7ff;text-align:center;width:100%;}
@@ -780,38 +784,79 @@ function deskInp(id,v){
 }
 function showDS(id,v){
   closeDS();
-  const box=document.getElementById('ds-'+id);if(!box)return;
-  const inp=document.querySelector('[data-dr="'+id+'"] .dinp');if(!inp)return;
-  if(!v){box.style.display='none';return;}
-  const m=CAT.filter(c=>c.n.includes(v)).slice(0,80);
-  if(!m.length){box.style.display='none';return;}
-  box.innerHTML=m.map(x=>'<div class="si" onmousedown="pickDesk('+id+',\''+x.n.replace(/'/g,"\\'")+'\')" ><span class="si-name">'+x.n+'</span><span class="si-src">'+Object.keys(x.s).join(' • ')+'</span></div>').join('');
-  
-  // Position calculation
+  const inp=document.querySelector('[data-dr="'+id+'"] .dinp');
+  if(!inp||!v) return;
+  const m=CAT.filter(c=>c.n.includes(v)).slice(0,100);
+  if(!m.length) return;
+
+  let box=document.getElementById('ds-'+id);
+  if(!box){
+    box=document.createElement('div');
+    box.id='ds-'+id;
+    box.className='dsug';
+    document.body.appendChild(box);
+  }
+
+  box.innerHTML=m.map(x=>
+    '<div class="si" onmousedown="pickDesk('+id+',\''+x.n.replace(/'/g,"\\'")+'\')" >'+
+    '<span class="si-name">'+x.n+'</span>'+
+    '<span class="si-src">'+Object.keys(x.s).join(' • ')+'</span></div>'
+  ).join('');
+
   const r = inp.getBoundingClientRect();
-  const spaceBelow = window.innerHeight - r.bottom;
-  const menuH = Math.min(250, m.length * 44);
-  
-  // Always show below the input, scrolled into view
-  box.style.position = 'fixed';
-  box.style.width = Math.max(r.width, 280) + 'px';
-  box.style.left = r.left + 'px';
-  box.style.right = 'auto';
-  
-  if (spaceBelow >= menuH || spaceBelow >= 150) {
-    // Show below
+  const spBelow = window.innerHeight - r.bottom - 8;
+  const spAbove = r.top - 8;
+  const menuH = Math.min(280, m.length * 44);
+
+  // Reset all position styles first
+  box.style.cssText = [
+    'position:fixed',
+    'background:#fff',
+    'border:1.5px solid #dde3ef',
+    'border-radius:10px',
+    'overflow-y:auto',
+    'overflow-x:hidden',
+    '-webkit-overflow-scrolling:touch',
+    'overscroll-behavior:contain',
+    'z-index:2147483647',
+    'box-shadow:0 8px 30px rgba(10,22,40,.2)',
+    'min-width:280px',
+    'display:block',
+    'pointer-events:auto',
+    'width:'+Math.max(r.width,300)+'px',
+    'left:'+r.left+'px',
+    'right:auto'
+  ].join(';');
+
+  if(spBelow >= 150){
+    // Show BELOW input — most common case
     box.style.top = (r.bottom + 4) + 'px';
     box.style.bottom = 'auto';
+    box.style.maxHeight = Math.min(280, spBelow) + 'px';
+  } else if(spAbove >= 150){
+    // Show ABOVE input
+    const h = Math.min(280, spAbove);
+    box.style.top = (r.top - h - 4) + 'px';
+    box.style.bottom = 'auto';
+    box.style.maxHeight = h + 'px';
   } else {
-    // Show above
-    box.style.bottom = (window.innerHeight - r.top + 4) + 'px';
-    box.style.top = 'auto';
+    // Not enough space either side — show centered in viewport
+    const h = Math.min(280, window.innerHeight - 100);
+    box.style.top = Math.max(50, (window.innerHeight - h) / 2) + 'px';
+    box.style.bottom = 'auto';
+    box.style.maxHeight = h + 'px';
   }
-  
-  box.style.display = 'block';
-  box.style.zIndex = '999999';
+
   dARid = id;
+
+  // Fast scroll with mouse wheel
+  box.onwheel = function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    box.scrollTop += e.deltaY * 2.5;
+  };
 }
+
 function closeDS(){document.querySelectorAll('.dsug').forEach(b=>b.style.display='none');dARid=null;}
 function pickDesk(id,name){
   const row=rows.find(r=>r.id===id);if(!row)return;
@@ -887,7 +932,7 @@ function renderDesk(){
       '<td class="ca"><button class="btn b-del" onclick="delRow('+r.id+')">✕</button></td>'+
     '</tr>';
   }).join('');
-  rows.forEach(r=>{const b=document.createElement('div');b.id='ds-'+r.id;b.className='dsug';document.body.appendChild(b);});
+  // dsug boxes created on demand in showDS
 }
 
 /* ── SUMMARY ── */
