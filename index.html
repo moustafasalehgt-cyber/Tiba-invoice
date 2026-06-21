@@ -171,7 +171,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
 .dtbl-wrap tbody td{padding:7px 8px;font-size:13px;vertical-align:middle;text-align:center;overflow:visible;}
 .dtbl-wrap tbody td.cn{text-align:right;padding-right:10px;overflow:visible;}
 .rn{width:40px;font-weight:700;color:var(--muted);font-size:12px;}
-.cn{min-width:260px;}.cs{width:90px;}.cp{width:105px;}.cq{width:90px;}.csm{width:75px;}.ct{width:110px;}.ca{width:46px;}
+.cn{min-width:260px;}.cs{width:90px;}.cp{width:105px;}.cq{width:90px;}.csm{width:75px;}.ccu{width:70px;}.ct{width:110px;}.ca{width:46px;}
 .dinp{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'Cairo',sans-serif;direction:rtl;text-align:right;background:#f8faff;outline:none;}
 .dinp:focus{border-color:var(--blue);background:#fff;}
 .dinp.filled{background:#fff;border-color:#86b3d6;}
@@ -197,7 +197,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   body{background:#fff!important;}
-  .tbar,.b-del,.ca,.csm,.soverlay,.cards,.tiers-card,.hdr,.dbar,.cbar,.toast,.slbar,.list-overlay,.confirm-overlay{display:none!important;}
+  .tbar,.b-del,.ca,.csm,.ccu,.soverlay,.cards,.tiers-card,.hdr,.dbar,.cbar,.toast,.slbar,.list-overlay,.confirm-overlay{display:none!important;}
   .print-hdr{display:flex!important;}
   .print-cblock{display:flex!important;}
   .dtbl-wrap{display:block!important;box-shadow:none!important;border:1px solid #ccc!important;margin-bottom:14px!important;}
@@ -208,6 +208,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
   .sum-card{box-shadow:none!important;border:1px solid #ccc!important;}
   .grand{box-shadow:none!important;border-radius:8px!important;flex-direction:column!important;align-items:flex-start!important;}
   .smpl-total{box-shadow:none!important;border:1.5px solid #f59e0b!important;}
+  #summary{page-break-before:always!important;break-before:page!important;padding-top:8px!important;}
+  .sum-grid{page-break-inside:avoid;}
   .dtbl-wrap thead{background:#0a1628!important;}
   .dtbl-wrap thead th{color:#fff!important;font-size:10px!important;padding:7px 5px!important;}
   .dtbl-wrap tbody td{font-size:10px!important;padding:5px!important;}
@@ -324,6 +326,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
 .smpl-total .st-lbl{font-size:12px;color:#92400e;font-weight:700;margin-bottom:2px;}
 .smpl-total .st-amt{font-size:19px;color:#78350f;font-weight:900;}
 .smpl-total .st-count{background:#92400e;color:#fef3c7;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;}
+
+/* ── CUSTODY TOGGLE ── */
+.cstd-wrap{display:flex;align-items:center;gap:4px;margin-top:6px;}
+.cstd-chk{display:flex;align-items:center;gap:5px;cursor:pointer;background:#dbeafe;border:1.5px solid #60a5fa;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;color:#1d4ed8;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+.cstd-chk input{width:15px;height:15px;cursor:pointer;accent-color:#2563eb;}
+.cstd-chk.active{background:#bfdbfe;border-color:#2563eb;}
+.dcstd-chk{display:inline-flex;align-items:center;gap:3px;cursor:pointer;font-size:10px;font-weight:700;color:#1d4ed8;-webkit-user-select:none;user-select:none;}
+.dcstd-chk input{width:13px;height:13px;cursor:pointer;accent-color:#2563eb;}
+.smpl-cstd-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
 </style>
 </head>
 <body>
@@ -506,7 +517,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
         <th class="rn">#</th>
         <th class="cn" style="text-align:right;padding-right:12px">اسم الصنف</th>
         <th class="cs">المصدر</th><th class="cp">السعر (جنيه)</th>
-        <th class="cq">الكمية (كجم)</th><th class="csm">عينة</th><th class="ct">الإجمالى</th><th class="ca"></th>
+        <th class="cq">الكمية (كجم)</th><th class="csm">عينة</th><th class="ccu">عهدة</th><th class="ct">الإجمالى</th><th class="ca"></th>
       </tr></thead>
       <tbody id="desk-body"></tbody>
     </table>
@@ -740,14 +751,48 @@ function doWhatsApp(){
   lines.push('━━━━━━━━━━━━━━━━━');
   if(rows.length){
     lines.push('📦 *الأصناف:*');
-    rows.forEach((r,i)=>{if(r.name&&r.price)lines.push((i+1)+'. '+r.name+' — '+fmt(r.qty,2)+' كجم');});
+    let itemNum=0;
+    rows.forEach((r)=>{
+      if(r.name){
+        itemNum++;
+        let tags='';
+        if(r.isSample) tags+=' 🎁(عينة مجانية)';
+        if(r.isCustody) tags+=' 📦(عهدة)';
+        lines.push(itemNum+'. '+r.name+' — '+fmt(r.qty,2)+' كجم'+tags);
+      }
+    });
     lines.push('━━━━━━━━━━━━━━━━━');
   }
   const bySrc={};
   for(const r of rows){if(!r.source||!r.price)continue;if(!bySrc[r.source])bySrc[r.source]={qty:0,amt:0};bySrc[r.source].qty+=r.qty||0;bySrc[r.source].amt+=(r.qty||0)*(r.price||0);}
   let tot=0,fin=0;
-  Object.keys(bySrc).forEach(s=>{const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc);tot+=d.amt;fin+=f;lines.push('🏷️ '+s+': '+fmt(d.amt)+' جنيه'+(dc>0?' (خصم '+fmtp(dc)+')':''));});
+  Object.keys(bySrc).forEach(s=>{
+    const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc),discAmt=d.amt-f;
+    tot+=d.amt;fin+=f;
+    let line='🏷️ '+s+': '+fmt(d.amt)+' جنيه';
+    if(dc>0) line+=' (خصم '+fmtp(dc)+' = -'+fmt(discAmt)+' جنيه)';
+    lines.push(line);
+  });
   lines.push('💰 *الإجمالى بعد الخصم: '+fmt(fin)+' جنيه*');
+
+  // Samples section
+  const sampleRows=rows.filter(r=>r.isSample&&r.name);
+  if(sampleRows.length){
+    const sampleTotal=sampleRows.reduce((s,r)=>s+(r.qty||0)*(r.origPrice||0),0);
+    lines.push('━━━━━━━━━━━━━━━━━');
+    lines.push('🎁 *عينات مجانية (' + sampleRows.length + ' صنف):*');
+    sampleRows.forEach(r=>lines.push('• '+r.name+' — '+fmt(r.qty,2)+' كجم'));
+    lines.push('💵 قيمة العينات: *'+fmt(sampleTotal)+' جنيه* (مجاناً)');
+  }
+
+  // Custody section
+  const custodyRows=rows.filter(r=>r.isCustody&&r.name);
+  if(custodyRows.length){
+    lines.push('━━━━━━━━━━━━━━━━━');
+    lines.push('📦 *أصناف عهدة (' + custodyRows.length + ' صنف):*');
+    custodyRows.forEach(r=>lines.push('• '+r.name+' — '+fmt(r.qty,2)+' كجم'));
+  }
+
   lines.push('━━━━━━━━━━━━━━━━━');
   lines.push('⚠️ الأسعار استرشادية وغير نهائية قبل الفاتورة المعتمدة');
   const msg=lines.join('\n');
@@ -791,9 +836,16 @@ function toggleSample(id, checked){
   renderAll();updSum();
 }
 
+/* ── CUSTODY TOGGLE ── */
+function toggleCustody(id, checked){
+  const row=rows.find(r=>r.id===id);if(!row)return;
+  row.isCustody=checked;
+  renderAll();updSum();
+}
+
 /* ── ROWS ── */
 function addRow(){
-  const id=++rid;rows.push({id,name:'',source:'',price:0,qty:1,origPrice:0,isSample:false});
+  const id=++rid;rows.push({id,name:'',source:'',price:0,qty:1,origPrice:0,isSample:false,isCustody:false});
   renderAll();
   setTimeout(()=>{if(isMob())openS(id);else{const el=document.querySelector('[data-dr="'+id+'"] .dinp');if(el)el.focus();}},80);
 }
@@ -960,7 +1012,10 @@ function renderMob(){
         '<div><div class="flbl">السعر</div><div class="prc-d">'+priceDisp+'</div></div>'+
         '<div><div class="flbl">الكمية (كجم)</div><input class="qty-i" type="number" list="qty-list" step="0.001" min="0.001" value="'+r.qty+'" inputmode="decimal" oninput="chgQty('+r.id+',this.value)"></div>'+
       '</div>'+
-      (r.name?('<div class="smpl-wrap"><label class="smpl-chk'+(r.isSample?' active':'')+'"><input type="checkbox" '+(r.isSample?'checked':'')+' onchange="toggleSample('+r.id+',this.checked)"> 🎁 عينة مجانية (سعر صفر)</label></div>'):'')+
+      (r.name?('<div class="smpl-cstd-row">'+
+        '<label class="smpl-chk'+(r.isSample?' active':'')+'"><input type="checkbox" '+(r.isSample?'checked':'')+' onchange="toggleSample('+r.id+',this.checked)"> 🎁 عينة مجانية</label>'+
+        '<label class="cstd-chk'+(r.isCustody?' active':'')+'"><input type="checkbox" '+(r.isCustody?'checked':'')+' onchange="toggleCustody('+r.id+',this.checked)"> 📦 عهدة</label>'+
+      '</div>'):'')+
       '<div class="ic-total"><span>إجمالى الصنف</span><span id="tot-'+r.id+'">'+fmt(r.qty*r.price)+' جنيه</span></div>';
     c.appendChild(card);
   });
@@ -980,6 +1035,7 @@ function renderDesk(){
       :(r.source?'<span class="src-b '+(r.source==='لوزى'?'luzi':'lotus')+'">'+r.source+'</span>':'—');
     const priceDisp = r.isSample ? '<span style="text-decoration:line-through;color:#94a3b8;font-size:11px">'+fmt(r.origPrice||0)+'</span>' : (r.price?fmt(r.price):'');
     const smplCell = r.name ? '<label class="dsmpl-chk" title="عينة مجانية"><input type="checkbox" '+(r.isSample?'checked':'')+' onchange="toggleSample('+r.id+',this.checked)"> 🎁</label>' : '';
+    const cstdCell = r.name ? '<label class="dcstd-chk" title="عهدة"><input type="checkbox" '+(r.isCustody?'checked':'')+' onchange="toggleCustody('+r.id+',this.checked)"> 📦</label>' : '';
     return '<tr data-dr="'+r.id+'">'+
       '<td class="rn">'+(i+1)+'</td>'+
       '<td class="cn"><div style="position:relative"><input class="dinp'+(r.name?' filled':'')+'" type="text" value="'+(r.name||'')+'" placeholder="ابحث بالاسم..." oninput="deskInp('+r.id+',this.value)" onfocus="showDS('+r.id+',this.value)" onblur="hideDS('+r.id+')"></div></td>'+
@@ -987,7 +1043,8 @@ function renderDesk(){
       '<td class="cp"><div class="dprc">'+priceDisp+'</div></td>'+
       '<td class="cq"><input class="dqty" type="number" list="qty-list" step="0.001" min="0.001" value="'+r.qty+'" oninput="chgQty('+r.id+',this.value)"></td>'+
       '<td class="csm">'+smplCell+'</td>'+
-      '<td class="ct dtot">'+fmt(r.qty*r.price)+(r.isSample?' <span style="color:#92400e;font-size:10px">(مجانى)</span>':'')+'</td>'+
+      '<td class="ccu">'+cstdCell+'</td>'+
+      '<td class="ct dtot">'+fmt(r.qty*r.price)+(r.isSample?' <span style="color:#92400e;font-size:10px">(مجانى)</span>':'')+(r.isCustody?' <span style="color:#1d4ed8;font-size:10px">(عهدة)</span>':'')+'</td>'+
       '<td class="ca"><button class="btn b-del" onclick="delRow('+r.id+')">✕</button></td>'+
     '</tr>';
   }).join('');
@@ -1147,7 +1204,7 @@ function buildSaveData() {
     mode:   discMode,
     dluzi:  document.getElementById('d-luzi').value,
     dlotus: document.getElementById('d-lotus').value,
-    rows:   rows.map(r => ({name:r.name, source:r.source, price:r.price, qty:r.qty, origPrice:r.origPrice||r.price, isSample:r.isSample||false})),
+    rows:   rows.map(r => ({name:r.name, source:r.source, price:r.price, qty:r.qty, origPrice:r.origPrice||r.price, isSample:r.isSample||false, isCustody:r.isCustody||false})),
     saved:  new Date().toLocaleDateString('ar-EG', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})
   };
 }
@@ -1168,7 +1225,7 @@ function restoreSaveData(data) {
   rid = 0;
   (data.rows || []).forEach(r => {
     const id = ++rid;
-    rows.push({id, name:r.name, source:r.source, price:r.price, qty:r.qty, origPrice:r.origPrice||r.price, isSample:r.isSample||false});
+    rows.push({id, name:r.name, source:r.source, price:r.price, qty:r.qty, origPrice:r.origPrice||r.price, isSample:r.isSample||false, isCustody:r.isCustody||false});
   });
   renderAll();
   updSum();
