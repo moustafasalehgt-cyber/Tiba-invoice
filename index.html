@@ -486,8 +486,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
   <span class="sl-lbl">💾 بيانات العرض:</span>
   <input class="sl-inp" id="sl-num" type="text" placeholder="رقم العرض..." maxlength="10">
   <button class="btn b-save" onclick="saveInvoice()">💾 حفظ</button>
-  <button class="btn b-load" onclick="loadInvoice()">📂 استدعاء</button>
-  <button class="btn b-list" onclick="openList()">📋 القائمة</button>
+  <button class="btn b-load" onclick="openList()">📂 استدعاء فاتورة</button>
   <span class="sl-status" id="sl-status"></span>
 </div>
 
@@ -495,7 +494,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direc
 <div class="list-overlay" id="list-overlay">
   <div class="list-modal">
     <div class="list-modal-hdr">
-      <span>📋 العروض المحفوظة</span>
+      <span>📂 عروضى المحفوظة</span>
       <button class="list-modal-close" onclick="closeList()">✕ إغلاق</button>
     </div>
     <div class="list-body" id="list-body"></div>
