@@ -743,9 +743,17 @@ const serial='عرض سعر #'+String(now.getTime()).slice(-4);
 document.getElementById('p-num').textContent=serial;
 
 function isMob(){return window.innerWidth<768;}
-function fmt(n,d=0){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:d,maximumFractionDigits:d});}
-function fmtQty(n){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:3,maximumFractionDigits:3});}
-function fmtMoney(n){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmt(n,d=0){
+  return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+function fmtQty(n){
+  // كجم - 3 أرقام بعد النقطة
+  return Number(n).toLocaleString('en-US',{minimumFractionDigits:3,maximumFractionDigits:3});
+}
+function fmtMoney(n){
+  // جنيه - رقمان بعد النقطة
+  return Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
 function fmtp(n){return(n*100).toFixed(1).replace(/\.0$/,'')+'%';}
 function disc(src,qty){
   if(discMode==='none')return 0;
