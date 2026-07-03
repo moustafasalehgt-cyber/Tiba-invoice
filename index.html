@@ -744,6 +744,8 @@ document.getElementById('p-num').textContent=serial;
 
 function isMob(){return window.innerWidth<768;}
 function fmt(n,d=0){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmtQty(n){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:3,maximumFractionDigits:3});}
+function fmtMoney(n){return Number(n).toLocaleString('ar-EG',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtp(n){return(n*100).toFixed(1).replace(/\.0$/,'')+'%';}
 function disc(src,qty){
   if(discMode==='none')return 0;
@@ -830,7 +832,7 @@ function doWhatsApp(){
         let tags='';
         if(r.isSample) tags+=' 🎁(عينة مجانية)';
         if(r.isCustody) tags+=' 📦(عهدة)';
-        lines.push(itemNum+'. '+r.name+(r.brand?' ('+r.brand+')':'')+' — '+fmt(r.qty,2)+' كجم'+tags);
+        lines.push(itemNum+'. '+r.name+(r.brand?' ('+r.brand+')':'')+' — '+fmtQty(r.qty)+' كجم'+tags);
       }
     });
     lines.push('━━━━━━━━━━━━━━━━━');
@@ -841,11 +843,11 @@ function doWhatsApp(){
   Object.keys(bySrc).forEach(s=>{
     const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc),discAmt=d.amt-f;
     tot+=d.amt;fin+=f;
-    let line='🏷️ '+s+': '+fmt(d.amt)+' جنيه';
-    if(dc>0) line+=' (خصم '+fmtp(dc)+' = -'+fmt(discAmt)+' جنيه)';
+    let line='🏷️ '+s+': '+fmtMoney(d.amt)+' جنيه';
+    if(dc>0) line+=' (خصم '+fmtp(dc)+' = -'+fmtMoney(discAmt)+' جنيه)';
     lines.push(line);
   });
-  lines.push('💰 *الإجمالى بعد الخصم: '+fmt(fin)+' جنيه*');
+  lines.push('💰 *الإجمالى بعد الخصم: '+fmtMoney(fin)+' جنيه*');
 
   // Samples section
   const sampleRows=rows.filter(r=>r.isSample&&r.name);
@@ -853,8 +855,8 @@ function doWhatsApp(){
     const sampleTotal=sampleRows.reduce((s,r)=>s+(r.qty||0)*(r.origPrice||0),0);
     lines.push('━━━━━━━━━━━━━━━━━');
     lines.push('🎁 *عينات مجانية (' + sampleRows.length + ' صنف):*');
-    sampleRows.forEach(r=>lines.push('• '+r.name+' — '+fmt(r.qty,2)+' كجم'));
-    lines.push('💵 قيمة العينات: *'+fmt(sampleTotal)+' جنيه* (مجاناً)');
+    sampleRows.forEach(r=>lines.push('• '+r.name+' — '+fmtQty(r.qty)+' كجم'));
+    lines.push('💵 قيمة العينات: *'+fmtMoney(sampleTotal)+' جنيه* (مجاناً)');
   }
 
   // Custody section
@@ -862,7 +864,7 @@ function doWhatsApp(){
   if(custodyRows.length){
     lines.push('━━━━━━━━━━━━━━━━━');
     lines.push('📦 *أصناف عهدة (' + custodyRows.length + ' صنف):*');
-    custodyRows.forEach(r=>lines.push('• '+r.name+' — '+fmt(r.qty,2)+' كجم'));
+    custodyRows.forEach(r=>lines.push('• '+r.name+' — '+fmtQty(r.qty)+' كجم'));
   }
 
   lines.push('━━━━━━━━━━━━━━━━━');
@@ -1138,7 +1140,7 @@ function chgQty(id,v){
   if(dprc) dprc.innerHTML = row.isSample ? '' : (row.price ? fmt(row.price)+surcharge : '');
 
   const dtot = document.querySelector('[data-dr="'+id+'"] .dtot');
-  if(dtot) dtot.innerHTML = fmt(row.qty*row.price) +
+  if(dtot) dtot.innerHTML = fmtMoney(row.qty*row.price) +
     (row.isSample?' <span style="color:#92400e;font-size:10px">(مجانى)</span>':'') +
     (row.isCustody?' <span style="color:#1d4ed8;font-size:10px">(عهدة)</span>':'');
 
@@ -1149,7 +1151,7 @@ function chgQty(id,v){
     // find card by row index
   });
   const totMob = document.getElementById('tot-'+id);
-  if(totMob) totMob.textContent = fmt(row.qty*row.price)+' جنيه';
+  if(totMob) totMob.textContent = fmtMoney(row.qty*row.price)+' جنيه';
   // Mobile price div - find by id approach
   const prcMob = document.getElementById('prc-'+id);
   if(prcMob) prcMob.innerHTML = adjPriceStr;
@@ -1173,7 +1175,7 @@ function renderMob(){
       ?'<select class="src-sel" onchange="chgSrc('+r.id+',this.value)">'+srcs.map(s=>'<option value="'+s+'"'+(s===r.source?' selected':'')+'>'+s+'</option>').join('')+'</select>'
       :(r.source?'<span class="src-b '+(r.source==='لوزى'?'luzi':'lotus')+'">'+r.source+'</span>':'—');
     const surcharge = r.isSample?'':getSurchargeLabel(r.origPrice,r.qty);
-    const priceDisp = r.isSample ? '<span style="text-decoration:line-through;color:#94a3b8;font-size:11px">'+fmt(r.origPrice||0)+'</span> <b style="color:#92400e">مجانى</b>' : (r.price?fmt(r.price)+surcharge:'—');
+    const priceDisp = r.isSample ? '<span style="text-decoration:line-through;color:#94a3b8;font-size:11px">'+fmtMoney(r.origPrice||0)+'</span> <b style="color:#92400e">مجانى</b>' : (r.price?fmtMoney(r.price)+surcharge:'—');
     const card=document.createElement('div');
     card.className='inv-card';
     card.innerHTML=
@@ -1191,7 +1193,7 @@ function renderMob(){
         '<label class="smpl-chk'+(r.isSample?' active':'')+'"><input type="checkbox" '+(r.isSample?'checked':'')+' onchange="toggleSample('+r.id+',this.checked)"> 🎁 عينة مجانية</label>'+
         '<label class="cstd-chk'+(r.isCustody?' active':'')+'"><input type="checkbox" '+(r.isCustody?'checked':'')+' onchange="toggleCustody('+r.id+',this.checked)"> 📦 عهدة</label>'+
       '</div>'):'')+
-      '<div class="ic-total"><span>إجمالى الصنف</span><span id="tot-'+r.id+'">'+fmt(r.qty*r.price)+' جنيه</span></div>';
+      '<div class="ic-total"><span>إجمالى الصنف</span><span id="tot-'+r.id+'">'+fmtMoney(r.qty*r.price)+' جنيه</span></div>';
     c.appendChild(card);
   });
 }
@@ -1209,7 +1211,7 @@ function renderDesk(){
       ?'<select class="dsrc" onchange="chgSrc('+r.id+',this.value)">'+srcs.map(s=>'<option value="'+s+'"'+(s===r.source?' selected':'')+'>'+s+'</option>').join('')+'</select>'
       :(r.source?'<span class="src-b '+(r.source==='لوزى'?'luzi':'lotus')+'">'+r.source+'</span>':'—');
     const surcharge2 = r.isSample?'':getSurchargeLabel(r.origPrice,r.qty);
-    const priceDisp = r.isSample ? '<span style="text-decoration:line-through;color:#94a3b8;font-size:11px">'+fmt(r.origPrice||0)+'</span>' : (r.price?fmt(r.price)+surcharge2:'');
+    const priceDisp = r.isSample ? '<span style="text-decoration:line-through;color:#94a3b8;font-size:11px">'+fmtMoney(r.origPrice||0)+'</span>' : (r.price?fmtMoney(r.price)+surcharge2:'');
     const smplCell = r.name ? '<label class="dsmpl-chk" title="عينة مجانية"><input type="checkbox" '+(r.isSample?'checked':'')+' onchange="toggleSample('+r.id+',this.checked)"> 🎁</label>' : '';
     const cstdCell = r.name ? '<label class="dcstd-chk" title="عهدة"><input type="checkbox" '+(r.isCustody?'checked':'')+' onchange="toggleCustody('+r.id+',this.checked)"> 📦</label>' : '';
     return '<tr data-dr="'+r.id+'">'+
@@ -1221,7 +1223,7 @@ function renderDesk(){
       '<td class="cq"><input class="dqty" type="number" list="qty-list" step="0.001" min="0.001" value="'+r.qty+'" oninput="chgQty('+r.id+',this.value)"></td>'+
       '<td class="csm">'+smplCell+'</td>'+
       '<td class="ccu">'+cstdCell+'</td>'+
-      '<td class="ct dtot">'+fmt(r.qty*r.price)+(r.isSample?' <span style="color:#92400e;font-size:10px">(مجانى)</span>':'')+(r.isCustody?' <span style="color:#1d4ed8;font-size:10px">(عهدة)</span>':'')+'</td>'+
+      '<td class="ct dtot">'+fmtMoney(r.qty*r.price)+(r.isSample?' <span style="color:#92400e;font-size:10px">(مجانى)</span>':'')+(r.isCustody?' <span style="color:#1d4ed8;font-size:10px">(عهدة)</span>':'')+'</td>'+
       '<td class="ca"><button class="btn b-del" onclick="delRow('+r.id+')">✕</button></td>'+
     '</tr>';
   }).join('');
@@ -1253,31 +1255,31 @@ function updSum(){
     const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc),discAmt=d.amt-f;
     tAmt+=d.amt;tFin+=f;tQty+=d.qty;
     const discCell = discMode==='none' ? '<span class="mbadge">بدون خصم</span>' : (dc===0?'—':'<span class="'+bc+'">'+fmtp(dc)+'</span>');
-    const discAmtCell = discAmt>0 ? '<span style="color:#dc2626;font-weight:700">-'+fmt(discAmt)+' جنيه</span>' : '—';
-    return '<tr><td><span class="src-b '+(s==='لوزى'?'luzi':'lotus')+'">'+s+'</span></td><td>'+fmt(d.qty,2)+' كجم</td><td>'+fmt(d.amt)+' جنيه</td><td>'+discCell+'</td><td>'+discAmtCell+'</td><td><b>'+fmt(f)+' جنيه</b></td></tr>';
+    const discAmtCell = discAmt>0 ? '<span style="color:#dc2626;font-weight:700">-'+fmtMoney(discAmt)+' جنيه</span>' : '—';
+    return '<tr><td><span class="src-b '+(s==='لوزى'?'luzi':'lotus')+'">'+s+'</span></td><td>'+fmtQty(d.qty)+' كجم</td><td>'+fmtMoney(d.amt)+' جنيه</td><td>'+discCell+'</td><td>'+discAmtCell+'</td><td><b>'+fmtMoney(f)+' جنيه</b></td></tr>';
   }).join('');
 
   document.getElementById('mob-sum').innerHTML=srcs.map(s=>{
     const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc),discAmt=d.amt-f;
     return '<div class="sum-card"><div class="sum-ttl"><span class="src-b '+(s==='لوزى'?'luzi':'lotus')+'" style="margin-left:6px">'+s+'</span>ملخص المصدر</div>'+
-      '<div class="sum-row"><span class="k">إجمالى الكمية</span><span class="v">'+fmt(d.qty,2)+' كجم</span></div>'+
-      '<div class="sum-row"><span class="k">إجمالى المبلغ</span><span class="v">'+fmt(d.amt)+' جنيه</span></div>'+
+      '<div class="sum-row"><span class="k">إجمالى الكمية</span><span class="v">'+fmtQty(d.qty)+' كجم</span></div>'+
+      '<div class="sum-row"><span class="k">إجمالى المبلغ</span><span class="v">'+fmtMoney(d.amt)+' جنيه</span></div>'+
       '<div class="sum-row"><span class="k">نسبة الخصم</span><span class="v">'+(discMode==='none'?'<span class="mbadge">بدون خصم</span>':(dc===0?'—':'<span class="'+bc+'">'+fmtp(dc)+'</span>'))+'</span></div>'+
-      '<div class="sum-row"><span class="k">مبلغ الخصم</span><span class="v" style="color:#dc2626;font-weight:700">'+(discAmt>0?'-'+fmt(discAmt)+' جنيه':'—')+'</span></div>'+
-      '<div class="sum-row" style="background:#f0fdf4"><span class="k" style="color:#166534;font-weight:700">بعد الخصم</span><span class="v" style="color:#166534;font-size:15px">'+fmt(f)+' جنيه</span></div>'+
+      '<div class="sum-row"><span class="k">مبلغ الخصم</span><span class="v" style="color:#dc2626;font-weight:700">'+(discAmt>0?'-'+fmtMoney(discAmt)+' جنيه':'—')+'</span></div>'+
+      '<div class="sum-row" style="background:#f0fdf4"><span class="k" style="color:#166534;font-weight:700">بعد الخصم</span><span class="v" style="color:#166534;font-size:15px">'+fmtMoney(f)+' جنيه</span></div>'+
     '</div>';
   }).join('');
 
   const sav=tAmt-tFin;
-  document.getElementById('f-qty').textContent=fmt(tQty,2)+' كجم';
-  document.getElementById('f-amt').textContent=fmt(tAmt)+' جنيه';
+  document.getElementById('f-qty').textContent=fmtQty(tQty)+' كجم';
+  document.getElementById('f-amt').textContent=fmtMoney(tAmt)+' جنيه';
   document.getElementById('f-pct').textContent=(tAmt>0?fmtp(sav/tAmt):'—');
-  document.getElementById('f-sav').textContent='-'+fmt(sav)+' جنيه';
-  document.getElementById('f-fin').textContent=fmt(tFin)+' جنيه';
-  document.getElementById('g-amt').textContent=fmt(tFin);
-  document.getElementById('g-sav').textContent=fmt(sav)+' جنيه';
+  document.getElementById('f-sav').textContent='-'+fmtMoney(sav)+' جنيه';
+  document.getElementById('f-fin').textContent=fmtMoney(tFin)+' جنيه';
+  document.getElementById('g-amt').textContent=fmtMoney(tFin);
+  document.getElementById('g-sav').textContent=fmtMoney(sav)+' جنيه';
   document.getElementById('h-items').textContent=rows.length;
-  document.getElementById('h-total').textContent=fmt(tFin);
+  document.getElementById('h-total').textContent=fmtMoney(tFin);
   document.getElementById('summary').style.display=rows.length?'block':'none';
 
   // ── Samples total ──
@@ -1285,7 +1287,7 @@ function updSum(){
   const sampleTotal = sampleRows.reduce((sum, r) => sum + (r.qty||0) * (r.origPrice||0), 0);
   const stEl = document.getElementById('smpl-total');
   if (sampleRows.length > 0) {
-    document.getElementById('st-amt').textContent = fmt(sampleTotal) + ' جنيه';
+    document.getElementById('st-amt').textContent = fmtMoney(sampleTotal) + ' جنيه';
     document.getElementById('st-count').textContent = sampleRows.length + ' صنف';
     stEl.style.display = 'flex';
   } else {
