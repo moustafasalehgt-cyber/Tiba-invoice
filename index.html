@@ -754,6 +754,13 @@ function fmtMoney(n){
   // جنيه - رقمان بعد النقطة
   return Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
+// للواتساب - بدون فاصل آلاف عشان ما يتلخبطش
+function fmtWA(n,d=2){
+  return Number(n).toFixed(d);
+}
+function fmtWAQty(n){
+  return Number(n).toFixed(3);
+}
 function fmtp(n){return(n*100).toFixed(1).replace(/\.0$/,'')+'%';}
 function disc(src,qty){
   if(discMode==='none')return 0;
@@ -840,7 +847,7 @@ function doWhatsApp(){
         let tags='';
         if(r.isSample) tags+=' 🎁(عينة مجانية)';
         if(r.isCustody) tags+=' 📦(عهدة)';
-        lines.push(itemNum+'. '+r.name+(r.brand?' ('+r.brand+')':'')+(r.source?' ['+r.source+']':'')+' — '+fmtQty(r.qty)+' كجم'+tags);
+        lines.push(itemNum+'. '+r.name+(r.brand?' ('+r.brand+')':'')+(r.source?' ['+r.source+']':'')+' — '+fmtWAQty(r.qty)+' كجم'+tags);
       }
     });
     lines.push('━━━━━━━━━━━━━━━━━');
@@ -851,11 +858,11 @@ function doWhatsApp(){
   Object.keys(bySrc).forEach(s=>{
     const d=bySrc[s],dc=disc(s,d.qty),f=d.amt*(1-dc),discAmt=d.amt-f;
     tot+=d.amt;fin+=f;
-    let line='🏷️ '+s+': '+fmtMoney(d.amt)+' جنيه';
-    if(dc>0) line+=' (خصم '+fmtp(dc)+' = -'+fmtMoney(discAmt)+' جنيه)';
+    let line='🏷️ '+s+': '+fmtWA(d.amt)+' جنيه';
+    if(dc>0) line+=' (خصم '+fmtp(dc)+' = -'+fmtWA(discAmt)+' جنيه)';
     lines.push(line);
   });
-  lines.push('💰 *الإجمالى بعد الخصم: '+fmtMoney(fin)+' جنيه*');
+  lines.push('💰 *الإجمالى بعد الخصم: '+fmtWA(fin)+' جنيه*');
 
   // Samples section
   const sampleRows=rows.filter(r=>r.isSample&&r.name);
@@ -863,8 +870,8 @@ function doWhatsApp(){
     const sampleTotal=sampleRows.reduce((s,r)=>s+(r.qty||0)*(r.origPrice||0),0);
     lines.push('━━━━━━━━━━━━━━━━━');
     lines.push('🎁 *عينات مجانية (' + sampleRows.length + ' صنف):*');
-    sampleRows.forEach(r=>lines.push('• '+r.name+' — '+fmtQty(r.qty)+' كجم'));
-    lines.push('💵 قيمة العينات: *'+fmtMoney(sampleTotal)+' جنيه* (مجاناً)');
+    sampleRows.forEach(r=>lines.push('• '+r.name+' — '+fmtWAQty(r.qty)+' كجم'));
+    lines.push('💵 قيمة العينات: *'+fmtWA(sampleTotal)+' جنيه* (مجاناً)');
   }
 
   // Custody section
@@ -872,7 +879,7 @@ function doWhatsApp(){
   if(custodyRows.length){
     lines.push('━━━━━━━━━━━━━━━━━');
     lines.push('📦 *أصناف عهدة (' + custodyRows.length + ' صنف):*');
-    custodyRows.forEach(r=>lines.push('• '+r.name+' — '+fmtQty(r.qty)+' كجم'));
+    custodyRows.forEach(r=>lines.push('• '+r.name+' — '+fmtWAQty(r.qty)+' كجم'));
   }
 
   lines.push('━━━━━━━━━━━━━━━━━');
