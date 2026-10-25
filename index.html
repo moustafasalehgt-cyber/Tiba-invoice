@@ -847,7 +847,15 @@ function doWhatsApp(){
         let tags='';
         if(r.isSample) tags+=' 🎁(عينة مجانية)';
         if(r.isCustody) tags+=' 📦(عهدة)';
-        lines.push(itemNum+'. '+r.name+(r.brand?' ('+r.brand+')':'')+(r.source?' ['+r.source+']':'')+' — '+fmtWAQty(r.qty)+' كجم'+tags);
+        const adjPrice=r.isSample?r.origPrice||0:r.price||0;
+        const qtyAmt=adjPrice*(r.qty||0);
+        let itemLine=itemNum+'. '+r.name;
+        if(r.source) itemLine+=' ['+r.source+']';
+        itemLine+=' — '+fmtWAQty(r.qty)+' كجم';
+        itemLine+=' | سعر الكيلو: '+fmtWA(adjPrice)+' جنيه';
+        itemLine+=' | الإجمالى: '+fmtWA(qtyAmt)+' جنيه';
+        if(tags) itemLine+=tags;
+        lines.push(itemLine);
       }
     });
     lines.push('━━━━━━━━━━━━━━━━━');
